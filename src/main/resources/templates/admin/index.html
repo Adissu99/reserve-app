@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Hello There</title>
+</head>
+<body>
+<div class="container">
+  <div class="jumbotron text-center">
+    <h1>Admin Portal</h1>
+  </div>
+  <div class="well">
+      <b>Enter the intranet: </b><a th:href="@{/welcome}">Welcome page</a>
+      <b>See all users: </b><a th:href="@{/admin/users}">Users</a>
+      <b>Manage products: </b><a th:href="@{/admin/show-product-form}">Products</a>
+      <b>Make changes to configurations: </b><a th:href="@{/admin/show-config-form}">Configurations</a>
+  </div>
+</div>
+
+</body>
+</html>

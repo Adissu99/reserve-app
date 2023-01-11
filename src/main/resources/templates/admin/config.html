@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Config</title>
+</head>
+<body>
+    <h2>All configurations available</h2>
+    <table>
+        <tr>
+            <td><h4>Config Name</h4></td>
+            <td><h4>Config Value</h4></td>
+        </tr>
+        <th:block th:if="${availableConfigs != null && availableConfigs.size() > 0}">
+            <tr th:each="config : ${availableConfigs}">
+                <td th:text="${config.getName()}"></td>
+                <td th:text="${config.getValue()}"></td>
+            </tr>
+        </th:block>
+    </table>
+
+    <br>
+
+    <form name="modify-existing-config" method="post" action="#" onsubmit="return submitModify();" th:action="@{/admin/handle-config-modify}">
+        <h2>Be aware that things might not work after you modify a value!</h2>
+        <table>
+            <tr>
+                <td><h4>Config Name</h4></td>
+                <td><h4>Config Value</h4></td>
+            </tr>
+            <tr>
+                <td>
+                    <select name="config-name-modify" id="config-name-modify">
+                        <option value="nothing">Select a config name from the list</option>
+                        <th:block th:if="${availableConfigs != null && availableConfigs.size() > 0}">
+                            <th:block th:each="config : ${availableConfigs}">
+                                <option th:value="${config.getName()}" th:text="${config.getName()}"></option>
+                            </th:block>
+                        </th:block>
+                    </select>
+                </td>
+                <td><input type="text" name="config-value-modify" id="config-value-modify"></td>
+            </tr>
+        </table>
+
+        <button type="submit">Modify selected config</button>
+    </form>
+
+    <br>
+
+    <form name="insert-new-config" method="post" action="#" onsubmit="return submitInsert();" th:action="@{/admin/handle-config-insert}">
+        <h2>You have to make changes through code after you insert a new config!</h2>
+
+        <table>
+            <tr>
+                <td><h4>Config Name</h4></td>
+                <td><h4>Config Value</h4></td>
+            </tr>
+            <tr>
+                <td><input type="text" name="config-name-insert" id="config-name-insert"></td>
+                <td><input type="text" name="config-value-insert" id="config-value-insert"></td>
+            </tr>
+        </table>
+
+        <button type="submit">Insert a new config</button>
+    </form>
+
+    <form name="go-back" action="#" method="get" th:action="@{/admin-index}">
+        <button type="submit">Go back to Admin Portal</button>
+    </form>
+
+    <script>
+        function submitModify() {
+
+            var configName = document.forms['modify-existing-config']['config-name-modify'].value;
+            if( configName === 'nothing' ) {
+                alert('You have to select a config name.');
+                return false;
+            }
+
+            var configValue = document.forms['modify-existing-config']['config-value-modify'].value;
+
+            if( configValue.trim().length === 0 ) {
+                alert('You have to make a change to the config value.')
+                return false;
+            }
+
+            return true;
+        }
+
+        function submitInsert() {
+            var configName = document.forms['insert-new-config']['config-name-insert'].value;
+            var configValue = document.forms['insert-new-config']['config-value-insert'].value;
+
+            if( configValue.trim().length === 0 || configName.trim().length === 0 ) {
+                alert('You left one or both fields empty.')
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>

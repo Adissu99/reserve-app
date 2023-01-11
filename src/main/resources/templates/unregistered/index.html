@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Hello There</title>
+</head>
+<body>
+<div class="container">
+  <div class="jumbotron text-center">
+    <h1>Client Portal</h1>
+  </div>
+  <div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
+      erat lectus, vehicula feugiat ultricies at, tempus sed ante. Cras
+      arcu erat, lobortis vitae quam et, mollis pharetra odio. Nullam sit
+      amet congue ipsum. Nunc dapibus odio ut ligula venenatis porta non
+      id dui. Duis nec tempor tellus. Suspendisse id blandit ligula, sit
+      amet varius mauris. Nulla eu eros pharetra, tristique dui quis,
+      vehicula libero. Aenean a neque sit amet tellus porttitor rutrum nec
+      at leo.</p>
+
+    <div class="well">
+      <b>Enter the intranet: </b><a th:href="@{/welcome}">Welcome page</a> <br>
+      <b>See all users: </b><a th:href="@{/admin/users}">See users</a> <br>
+      <b>Send the verification email again: </b><a th:href="@{/resend-mail}">Resend</a> <br>
+      <b>Register: </b><button type="button"><a th:href="@{/register}">Register</a> </button> <br>
+      <b>Reserve: </b><button type="button"> <a th:href="@{/show-reserve}">Reserve</a></button> <br>
+      <b>Info: </b><button type="button"> <a th:href="@{/info-client}">Client Informations</a></button> <br>
+      <b>Invite someone: </b><button type="button"> <a th:href="@{/show-invite}">Invite</a></button> <br>
+      <b>Admin portal: </b><button type="button"> <a th:href="@{/admin-index}">Admin</a></button> <br>
+      <b>Log out:</b><button type="button"> <a th:href="@{/logout}">Log out</a></button> <br>
+    </div>
+  </div>
+</div>
+<!-- container -->
+
+</body>
+</html>

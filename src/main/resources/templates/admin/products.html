@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+    <h2>Available Products:</h2>
+    <table>
+        <tr>
+            <td><h4>Product ID</h4></td>
+            <td><h4>Product Name</h4></td>
+            <td><h4>Duration In Minutes</h4></td>
+        </tr>
+        <th:block th:if="${products != null}">
+            <tr th:each="product : ${products}">
+                <td th:text="${product.getId()}"></td>
+                <td th:text="${product.getProductName()}"></td>
+                <td th:text="${product.getDurationInMinutes()}"></td>
+            </tr>
+        </th:block>
+    </table>
+
+    <form name="modify-product" action="#" method="post" onsubmit="return submitModify();" th:action="@{/admin/handle-product-modify}">
+        <h2>Modify an existing product</h2>
+        <table>
+            <tr>
+                <td><h4>Product ID</h4></td>
+                <td><h4>New Product Name</h4></td>
+                <td><h4>New Duration</h4></td>
+            </tr>
+            <tr>
+                <td>
+                    <select name="product-id-modify">
+                        <option value="nothing">Please select a product id from the list</option>
+                        <th:block th:each="product : ${products}">
+                            <option th:value="${product.getId()}" th:text="${product.getId()}"></option>
+                        </th:block>
+                    </select>
+                </td>
+                <td><input type="text" name="product-name-modify" id="product-name-modify"></td>
+                <td>
+                    <select name="product-duration-modify" id="product-duration-modify">
+                        <option value="nothing">Select a new duration from the list</option>
+                        <th:block th:each="duration : ${availableDurations}">
+                            <option th:value="${availableDurations.indexOf(duration)}" th:text="${duration}"></option>
+                        </th:block>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button type="submit">Modify</button>
+    </form>
+
+    <form name="insert-product" action="#" method="post" onsubmit="return submitInsert();" th:action="@{/admin/handle-product-insert}">
+        <h2>Insert a new product</h2>
+        <table>
+            <tr>
+                <td><h4>Product Name</h4></td>
+                <td><h4>Duration</h4></td>
+            </tr>
+            <tr>
+                <td><input type="text" name="product-name-insert" id="product-name-insert"></td>
+                <td>
+                    <select name="product-duration-insert" id="product-duration-insert">
+                        <option value="nothing">Select a duration from the list</option>
+                        <th:block th:each="duration : ${availableDurations}">
+                            <option th:value="${availableDurations.indexOf(duration)}" th:text="${duration}"></option>
+                        </th:block>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button type="submit">Insert</button>
+    </form>
+
+    <form name="go-back" action="#" method="get" th:action="@{/admin-index}">
+        <button type="submit">Go back to Admin Portal</button>
+    </form>
+
+<script>
+    function submitModify() {
+
+        var productId = document.forms['modify-product']['product-id-modify'].value;
+        if( productId === 'nothing' ) {
+            alert('You have to select a product id.');
+            return false;
+        }
+
+        var productName = document.forms['modify-product']['product-name-modify'].value;
+        var productDuration = document.forms['modify-product']['product-duration-modify'].value;
+
+        if( productName.trim().length === 0 && productDuration === 'nothing' ) {
+            alert('You have to make a change to the product.')
+            return false;
+        }
+
+        return true;
+    }
+
+    function submitInsert() {
+        var productName = document.forms['insert-product']['product-name-insert'].value;
+        var productDuration = document.forms['insert-product']['product-duration-insert'].value;
+
+        if( productName.trim().length === 0 || productDuration === 'nothing' ) {
+            alert('You left one or both fields empty.')
+            return false;
+        }
+
+        return true;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Successfully Made a Reserve</title>
+</head>
+<body>
+    <h2 th:text="'You successfully did a reservation for product ' + ${alreadySelectedProduct} + ' on ' + ${alreadySelectedDate} + ' at ' + ${alreadySelectedHour}"/>
+    <form name="made-reserve-form" action="#" method="get" th:action="@{/after-reserve}">
+        <h1 th:text="'Click one of the following buttons'"/>
+        <button type="submit" id="submit-button-after-reserve-info" name="submitButton" value="info">Show info about me</button>
+        <button type="submit" id="submit-button-after-reserve-index" name="submitButton" value="index">Go back to user portal</button>
+        <button type="submit" id="submit-button-after-reserve-another" name="submitButton" value="reserve">Make another reservation</button>
+    </form>
+</body>
+</html>

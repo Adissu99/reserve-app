@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Informations</title>
+</head>
+<body>
+<form name="info-form" action="#" method="get" th:action="@{/unregistered/index}">
+    <table style="border-spacing: 30px" align="center">
+        <tr>
+            <td><h2>Reservations</h2></td>
+            <td><h2>Client</h2></td>
+            <td><h2>Invited Users</h2></td>
+        </tr>
+        <tr>
+            <td> <!-- RESERVATION SECTION -->
+                <table style="border-spacing: 10px;">
+                    <tr>
+                        <td><b>Product</b></td>
+                        <td><b>Date</b></td>
+                        <td><b>Starting hour</b></td>
+                    </tr>
+                    <th:block th:if="${reservationList} != null">
+                        <tr th:each="reservation : ${reservationList}">
+                            <td th:text="${reservation.getProduct().getProductName()}"></td>
+                            <td th:text="${#dates.format(reservation.getSelectedDate(), 'dd-MM-yyyy')}"></td>
+                            <td th:text="${reservation.getSelectedTime()}"></td>
+                        </tr>
+                    </th:block>
+                </table>
+            </td>
+            <td> <!-- CLIENT SECTION -->
+                <label for="firstName"><b>First Name:</b></label>
+                <p style="display:inline" id="firstName" th:text="${client.getFirstName()}"></p>
+                <br>
+                <label for="lastName"><b>Last Name:</b></label>
+                <p style="display:inline" id="lastName" th:text="${client.getLastName()}"></p>
+                <br>
+                <label for="email"><b>Email:</b></label>
+                <p style="display:inline" id="email" th:text="${client.getEmail()}"></p>
+                <br>
+                <label for="date-registered"><b>Registered on:</b></label>
+                <p style="display:inline" id="date-registered" th:text="${#dates.format(client.getRegisteredAt(), 'dd-MM-yyyy')}"></p>
+            </td>
+            <td> <!-- INVITED USERS SECTION -->
+                <table style="border-spacing: 10px;">
+                    <tr>
+                        <td><b>First Name</b></td>
+                        <td><b>Last Name</b></td>
+                        <td><b>Confirmed Email?</b></td>
+                    </tr>
+                    <th:block th:if="${invitedUsersList} != null">
+                        <tr th:each="invitedUser : ${invitedUsersList}">
+                            <td th:text="${invitedUser.getFirstName()}">Adi</td>
+                            <td th:text="${invitedUser.getLastName()}">Milea</td>
+                            <td th:text="${invitedUsersActivatedCheck.get(invitedUser.getEmail())} == true ? 'Yes' : 'No'">Yes</td>
+                        </tr>
+                    </th:block>
+                </table>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

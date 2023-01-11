@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification</title>
+</head>
+<body>
+    <div th:switch="${result}">
+        <!--    First email verification try    -->
+        <div th:case="'ERROR'">
+            <h2>Oops, something went wrong! Email was not verified. Try to send it again: </h2>
+        </div>
+        <h2 th:case="'ACTIVATED'">Your email has already been activated!</h2>
+        <h2 th:case="'SUCCESS'">Your email was successfully activated!</h2>
+
+        <!--    Response from resending email verification try   -->
+        <div th:case="'ERROR.RESENDING'">
+            <h2>Oops, something went wrong! Email was not sent again.</h2>
+            <a th:href="@{/resend-mail}">Try to send the activation mail again.</a>
+        </div>
+        <h2 th:case="'RESENT'">A new link has been sent to your email address.</h2>
+        <h2 th:case="'NOT-FOUND'">Email doesn't exist. Made a mistake? Try to enter it again:</h2>
+    </div>
+
+    <!--    Resend the activation mail    -->
+    <br>
+    <div th:if="${result} eq 'ERROR' or ${result} eq 'RESEND' or ${result} eq 'NOT-FOUND'">
+        <form action="#" th:action="@{/resend-mail}" method="post">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="email" name="email">
+            <button type="submit">Submit request</button>
+        </form>
+    </div>
+
+    <br>
+    <a th:href="@{/static}">Go back to the first page</a>
+    <br>
+</body>
+</html>

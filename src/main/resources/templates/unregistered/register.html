@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+    <form action="#" th:action="@{/register-client}" th:object="${newClient}" method="post">
+        <label for="firstName">First Name</label>
+        <input type="text" th:field="*{firstName}" id="firstName" placeholder="first name">
+        <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+
+        <label for="lastName">Last Name</label>
+        <input type="text" th:field="*{lastName}" id="lastName" placeholder="last name">
+        <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+
+        <label for="codeUsedToRegister">Registration Code</label>
+        <input type="text" th:field="*{codeUsedToRegister}" id="codeUsedToRegister" placeholder="registration code">
+        <span th:if="${#fields.hasErrors('codeUsedToRegister')}" th:errors="*{codeUsedToRegister}"></span>
+
+        <label for="email">Email</label>
+        <input type="email" th:field="*{email}" id="email" placeholder="email">
+        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+
+        <label for="password">Password</label>
+        <input type="password" th:field="*{password}" id="password" placeholder="password">
+        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+
+        <input type="submit" value="Register">
+    </form>
+</body>
+</html>

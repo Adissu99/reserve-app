@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Invite</title>
+</head>
+<body>
+  <h2>Invite codes</h2>
+  <table style="border-spacing: 10px">
+    <tr>
+        <td><b>Generated invite code</b></td>
+        <td><b>Is used?</b></td>
+        <td><b>Generated on</b></td>
+    </tr>
+    <th:block th:if="${inviteCodes} != null">
+      <tr th:each="invCode : ${inviteCodes}">
+          <td th:text="${invCode.getInvCode()}"></td>
+          <td th:text="${invCode.getIsUsed()}"></td>
+          <td th:text="${#dates.format(invCode.getGeneratedAt(), 'dd-MM-yyyy')}"></td>
+      </tr>
+    </th:block>
+  </table>
+
+  <h2>Generate another one</h2>
+  <form name="invite-form" action="#" method="post" th:action="@{/handle-invite}">
+      <button type="submit">Generate</button>
+  </form>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Make your reservation</title>
+</head>
+<body onload="handleShowable()">
+<!--  <div th:with="dateFromSession=${alreadySelectedDate}"></div>
+  <div th:with="productFromSession=${alreadySelectedProduct}"></div>-->
+
+  <p th:text="'From session: ' + ${alreadySelectedDate} + ', ' + ${alreadySelectedProduct}"></p>
+
+  <form name="reserve-form" action="#" th:action="@{/handle-reservation}" method="post">
+    <label for="selected-product">Select a product</label>
+    <select name="selected-product" id="selected-product" onchange="showDate()">
+        <div th:switch="${productList}">
+            <div th:case="null">No products yet</div>
+            <div th:case="*">
+                <option value="none">Select a product</option>
+                <div th:each="product : ${productList}">
+                    <option th:value="${product.getProductName()}" th:text="${product.getProductName()}"></option>
+                </div>
+            </div>
+        </div>
+    </select>
+    <br>
+    <label for="selected-date" id="label-date">Select a date to see available hours:</label>
+    <input type="date" id="selected-date" name="selected-date" onchange="showSubmitCheckTime()">
+
+      <div th:if="${result != null && result.equals('AVAILABLE')}">
+        <select name="selected-hour" id="selected-hour" onchange="showSubmitReserve()">
+            <option value="none">Selected an available hour</option>
+            <div th:each="hour : ${freeTimeList}">
+                <option th:value="${#strings.substring(hour, 0, 5)}" th:text="${#strings.substring(hour, 0, 5)}"></option>
+            </div>
+        </select>
+      </div>
+
+    <br>
+    <button type="submit" id="submit-button-check-time" name="submitButton" value="time">Check availability for selected date and product</button>
+    <button type="submit" id="submit-button-reserve" name="submitButton" value="reserve">Reserve with selected date, time and product</button>
+  </form>
+
+  <script th:inline="javascript">
+      function handleShowable() {
+          var alreadySelectedDate = [[${alreadySelectedDate}]];
+          var alreadySelectedProduct = [[${alreadySelectedProduct}]];
+
+           /*alert(alreadySelectedProduct);
+           alert(alreadySelectedDate);*/
+
+          if( alreadySelectedDate == null ) {
+              document.getElementById('selected-date').style.display = 'none';
+              document.getElementById('label-date').style.display = 'none';
+          } else {
+              document.getElementById('selected-date').value = alreadySelectedDate;
+          }
+
+          if( alreadySelectedProduct != null ) {
+              document.getElementById('selected-product').value = alreadySelectedProduct;
+          }
+
+          document.getElementById('submit-button-check-time').style.display = 'none';
+          document.getElementById('submit-button-reserve').style.display = 'none';
+      }
+  </script>
+
+  <script>
+      function showDate() {
+          if( document.getElementById('selected-product').value !== 'none' ) {
+              document.getElementById('selected-date').style.display = '';
+              document.getElementById('label-date').style.display = '';
+          }
+      }
+
+      function showSubmitCheckTime() {
+          if( document.getElementById('selected-date').value ) {
+              document.getElementById('submit-button-check-time').style.display = '';
+          }
+      }
+
+      function showSubmitReserve() {
+          if( document.getElementById('selected-hour').value !== 'none' ) {
+              document.getElementById('submit-button-reserve').style.display = '';
+          }
+      }
+  </script>
+
+<script>
+    var today = new Date();
+    var nextDay = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+    document.getElementById("selected-date").min = nextDay.toISOString().split("T")[0];
+</script>
+
+</body>
+</html>
+
