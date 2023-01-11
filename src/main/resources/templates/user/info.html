@@ -61,5 +61,25 @@
         </tr>
     </table>
 </form>
+<br>
+<form name="cancel-reservation" method="post" action="#" th:action="@{/delete-reservation}">
+    <th:block th:if="${reservationList} != null">
+        <h4>Cancel your future reservations</h4>
+        <table style="border-spacing: 30px">
+            <tr>
+                <td><b>Product</b></td>
+                <td><b>Date</b></td>
+                <td><b>Starting hour</b></td>
+                <td><b>Cancel</b></td>
+            </tr>
+            <tr th:each="reservation : ${reservationList}" th:if="${reservation.getSelectedDate().after(dayAfterTomorrowDate) || reservation.getSelectedDate().equals(dayAfterTomorrowDate)}">
+                <td th:text="${reservation.getProduct().getProductName()}"></td>
+                <td th:text="${#dates.format(reservation.getSelectedDate(), 'dd-MM-yyyy')}"></td>
+                <td th:text="${reservation.getSelectedTime()}"></td>
+                <td><button type="submit" th:value="${reservation.getId()}" name="cancelButton">Cancel Me</button></td>
+            </tr>
+        </table>
+    </th:block>
+</form>
 </body>
 </html>

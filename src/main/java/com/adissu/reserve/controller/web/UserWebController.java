@@ -3,6 +3,7 @@ package com.adissu.reserve.controller.web;
 import com.adissu.reserve.entity.Client;
 import com.adissu.reserve.entity.InviteCode;
 import com.adissu.reserve.entity.Product;
+import com.adissu.reserve.entity.Reservation;
 import com.adissu.reserve.service.ClientService;
 import com.adissu.reserve.service.InviteCodeService;
 import com.adissu.reserve.service.ProductService;
@@ -19,8 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,14 +105,7 @@ public class UserWebController {
         String page = "";
         switch (destination) {
             case "info":
-                String email = WebUtil.getUsername(httpServletRequest);
-                List<Client> invitedUsersList = clientService.getInvitedUsersList(email);
-
-                model.addAttribute("invitedUsersList", invitedUsersList);
-                model.addAttribute("invitedUsersActivatedCheck", clientService.getClientsActivatedFromList(invitedUsersList));
-                model.addAttribute("client", clientService.getClient(email));
-                model.addAttribute("reservationList", clientService.getReservationsMade(email));
-                page = "/user/info";
+                page = "redirect:/info-client";
                 break;
             case "index":
                 page = "/unregistered/index";
@@ -130,10 +127,19 @@ public class UserWebController {
         String email = WebUtil.getUsername(httpServletRequest);
         List<Client> invitedUsersList = clientService.getInvitedUsersList(email);
 
+        log.info("Day after tomorrow as date: {}", WebUtil.getDayAfterTomorrow());
+
         model.addAttribute("invitedUsersList", invitedUsersList);
         model.addAttribute("invitedUsersActivatedCheck", clientService.getClientsActivatedFromList(invitedUsersList));
         model.addAttribute("client", clientService.getClient(email));
         model.addAttribute("reservationList", clientService.getReservationsMade(email));
+        model.addAttribute("dayAfterTomorrowDate", WebUtil.getDayAfterTomorrow());
+
+        for(Reservation reservation : clientService.getReservationsMade(email)) {
+            if( reservation.getSelectedDate().after(WebUtil.getDayAfterTomorrow()) || reservation.getSelectedDate().equals(WebUtil.getDayAfterTomorrow()) ) {
+                log.info("Reservation with id {} and date {} is available for canceling", reservation.getId(), reservation.getSelectedDate());
+            }
+        }
 
         return "/user/info";
     }
@@ -150,6 +156,7 @@ public class UserWebController {
     }
 
     @PostMapping("/handle-invite")
+    @RolesAllowed("client")
     public String generateInviteCode(Model model, HttpServletRequest httpServletRequest) {
         String email = WebUtil.getUsername(httpServletRequest);
         Optional<InviteCode> inviteCode = inviteCodeService.generateInviteCode(email);
@@ -164,5 +171,15 @@ public class UserWebController {
         }
 
         return "/user/invite";
+    }
+
+    @PostMapping("/delete-reservation")
+    @RolesAllowed("client")
+    public String deleteReservation(@RequestParam("cancelButton") String cancelButtonId) {
+        log.info("Got id {} from input", cancelButtonId);
+        String result = reservationService.cancelReservation(cancelButtonId);
+        log.info("Result from canceling reservation {}", result);
+
+        return "redirect:/info-client";
     }
 }

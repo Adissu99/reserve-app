@@ -125,4 +125,15 @@ public class ReservationService {
 
         return "SUCCESS";
     }
+
+    public String cancelReservation(final String reservationId) {
+        int reserveId = Integer.parseInt(reservationId);
+
+        if( !reservationRepository.existsById(reserveId) ) {
+            return "FAIL";
+        }
+
+        reservationRepository.deleteById(reserveId);
+        return "SUCCESS";
+    }
 }

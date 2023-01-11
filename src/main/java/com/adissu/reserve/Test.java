@@ -2,6 +2,9 @@ package com.adissu.reserve;
 
 import com.adissu.reserve.util.ReserveUtil;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -64,6 +67,16 @@ public class Test {
         for (String freeTime : free) {
             System.out.println("freeTime = " + freeTime.substring(0, 5));
         }*/
+
+        LocalDate localDate = LocalDate.now().plusDays(2);
+        LocalDate localDate1 = LocalDate.now().plusDays(3);
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date date1 = Date.from(localDate1.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        System.out.println("localDate = " + localDate);
+        System.out.println("date = " + date);
+        System.out.println("date compare = " + (date.equals(date1)));
+        System.out.println("date1 >= date2 ? " + (date1.after(date)));
 
     }
 }
