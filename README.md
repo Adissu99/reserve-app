@@ -1,4 +1,6 @@
-# reserve
+# Reserve App (W.I.P.)
+
+
 
 This project is made using Java, Spring Boot, KeyCloak, Thymeleaf, Spring Data Jpa, MySQL.
 
