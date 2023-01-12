@@ -4,6 +4,7 @@ import com.adissu.reserve.repository.AdminConfigRepository;
 import com.adissu.reserve.repository.ClientRepository;
 import com.adissu.reserve.repository.ProductRepository;
 import com.adissu.reserve.service.AdminConfigService;
+import com.adissu.reserve.service.ClientService;
 import com.adissu.reserve.service.ProductService;
 import com.adissu.reserve.util.WebUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class AdminWebController {
     private final AdminConfigRepository adminConfigRepository;
     private final ProductService productService;
     private final AdminConfigService adminConfigService;
+    private final ClientService clientService;
 
     @GetMapping("/admin-index")
     @RolesAllowed("admin")
@@ -110,6 +112,16 @@ public class AdminWebController {
         model.addAttribute("availableConfigs", adminConfigRepository.findAll());
         model.addAttribute("result", result);
         return "/admin/config";
+    }
+
+    @PostMapping("/admin/make-admin")
+    @RolesAllowed("admin")
+    public String makeSomeoneAdmin(Model model, @RequestParam("userIdAdmin") String id) {
+        if( clientService.makeAdmin(id).contains("ERROR") ) {
+            log.info("An error has occurred while trying to make user with id {} an admin.", id);
+        }
+
+        return "redirect:/admin/users";
     }
 
 }

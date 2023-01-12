@@ -59,4 +59,17 @@ public class KeyCloakService {
         userResource.update(userRepresentation);
         log.info("User updated");
     }
+
+    public void makeAdmin(String email) {
+        UserRepresentation userRepresentation = realmResource.users().search(email).get(0);
+        log.info("Got userRepresentation {}", userRepresentation.toString());
+        UserResource userResource = realmResource.users().get(userRepresentation.getId());
+
+        RoleRepresentation roleRepresentation = realmResource.roles().get("admin").toRepresentation();
+        userResource.roles().realmLevel().add(Collections.singletonList(roleRepresentation));
+
+        log.info("Trying to update user..");
+        userResource.update(userRepresentation);
+        log.info("User updated");
+    }
 }

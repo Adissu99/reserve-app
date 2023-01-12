@@ -5,32 +5,38 @@
     <title>All users</title>
 </head>
 <body>
-    <div th:switch="${users}">
-        <h2 th:case="null">No users yet!</h2>
-        <div th:case="*">
-            <h2>Users</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Code used to register</th>
-                        <th>Email</th>
-                        <th>Password</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="user : ${users}">
-                        <td th:text="${user.getFirstName()}"></td>
-                        <td th:text="${user.getLastName()}"></td>
-                        <td th:text="${user.getCodeUsedToRegister()}"></td>
-                        <td th:text="${user.getEmail()}"></td>
-                        <td th:text="${user.getPassword()}"></td>
-                    </tr>
-                </tbody>
-            </table>
+    <form name="make-admin-form" action="#" method="post" th:action="@{/admin/make-admin}">
+        <div th:switch="${users}">
+            <h2 th:case="null">No users yet!</h2>
+            <div th:case="*">
+                <h2>Users</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Code used to register</th>
+                            <th>Email</th>
+                            <th>Password</th>
+                            <th>Role</th>
+                            <th>Make Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.getFirstName()}"></td>
+                            <td th:text="${user.getLastName()}"></td>
+                            <td th:text="${user.getCodeUsedToRegister()}"></td>
+                            <td th:text="${user.getEmail()}"></td>
+                            <td th:text="${user.getPassword()}"></td>
+                            <td th:text="${user.getRole()}"></td>
+                            <td><button type="submit" name="userIdAdmin" th:value="${user.getId()}" th:disabled="${user.getRole().equals('admin')}">Make Admin</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    </form>
     <form name="go-back" action="#" method="get" th:action="@{/admin-index}">
         <button type="submit">Go back to Admin Portal</button>
     </form>

@@ -73,6 +73,7 @@ public class ClientService {
             log.info("There was a problem sending the email.");
         }
 
+        client.setRole("client");
         return clientRepository.save(client);
     }
 
@@ -198,5 +199,17 @@ public class ClientService {
         }
 
         return client.get();
+    }
+
+    public String makeAdmin(String clientId) {
+        Optional<Client> client = clientRepository.findById(Integer.parseInt(clientId));
+        if( client.isEmpty() ) {
+            return "ERROR.NOT_FOUND";
+        }
+
+        keyCloakService.makeAdmin(client.get().getEmail());
+        client.get().setRole("admin");
+        clientRepository.save(client.get());
+        return "SUCCESS";
     }
 }

@@ -36,6 +36,7 @@ public class Client {
     private String codeUsedToRegister;
     private Date registeredAt;
     private String password;
+    private String role;
 
     public String getFullName() {
         return firstName + " " + lastName;
