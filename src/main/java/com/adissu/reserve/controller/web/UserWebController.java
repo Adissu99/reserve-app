@@ -8,6 +8,7 @@ import com.adissu.reserve.service.ClientService;
 import com.adissu.reserve.service.InviteCodeService;
 import com.adissu.reserve.service.ProductService;
 import com.adissu.reserve.service.ReservationService;
+import com.adissu.reserve.util.DateUtil;
 import com.adissu.reserve.util.WebUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
-import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,17 +125,19 @@ public class UserWebController {
         String email = WebUtil.getUsername(httpServletRequest);
         List<Client> invitedUsersList = clientService.getInvitedUsersList(email);
 
-        log.info("Day after tomorrow as date: {}", WebUtil.getDayAfterTomorrow());
-
         model.addAttribute("invitedUsersList", invitedUsersList);
         model.addAttribute("invitedUsersActivatedCheck", clientService.getClientsActivatedFromList(invitedUsersList));
         model.addAttribute("client", clientService.getClient(email));
         model.addAttribute("reservationList", clientService.getReservationsMade(email));
-        model.addAttribute("dayAfterTomorrowDate", WebUtil.getDayAfterTomorrow());
+        model.addAttribute("cancelledReservationList", clientService.getCancelledReservations(email));
+        model.addAttribute("tomorrowDate", DateUtil.getDateWithoutTimeFromToday(1));
+        model.addAttribute("yesterdayDate", DateUtil.getDateWithoutTimeFromToday(-1));
 
         for(Reservation reservation : clientService.getReservationsMade(email)) {
-            if( reservation.getSelectedDate().after(WebUtil.getDayAfterTomorrow()) || reservation.getSelectedDate().equals(WebUtil.getDayAfterTomorrow()) ) {
-                log.info("Reservation with id {} and date {} is available for canceling", reservation.getId(), reservation.getSelectedDate());
+            if( reservation.getSelectedDate().after(DateUtil.getDateWithoutTimeFromToday(1)) ) {
+                log.info("Reservation with id {} and date {} is available for cancelling", reservation.getId(), reservation.getSelectedDate());
+            } else if( reservation.getSelectedDate().after(DateUtil.getDateWithoutTimeFromToday(-1)) ) {
+                log.info("Reservation with id {} and date {} is available for requesting cancelling", reservation.getId(), reservation.getSelectedDate());
             }
         }
 
@@ -175,11 +175,18 @@ public class UserWebController {
 
     @PostMapping("/delete-reservation")
     @RolesAllowed("client")
-    public String deleteReservation(@RequestParam("cancelButton") String cancelButtonId) {
-        log.info("Got id {} from input", cancelButtonId);
-        String result = reservationService.cancelReservation(cancelButtonId);
-        log.info("Result from canceling reservation {}", result);
+    public String cancelReservation(@RequestParam(value = "cancelButton", required = false) String cancelButtonId, @RequestParam(value = "requestCancelButton", required = false) String requestCancelButtonId) {
+        log.info("Got cancelButtonId {}; requestCancelButtonId {} from input", cancelButtonId, requestCancelButtonId);
+        String result = "";
+        if( cancelButtonId == null || cancelButtonId.isBlank() ) {
+            result = reservationService.requestCancelReservation(requestCancelButtonId);
+            log.info("Result from requested cancelling reservation {}", result);
+        } else {
+            result = reservationService.cancelReservation(cancelButtonId);
+            log.info("Result from cancelling reservation {}", result);
+        }
 
         return "redirect:/info-client";
     }
+
 }

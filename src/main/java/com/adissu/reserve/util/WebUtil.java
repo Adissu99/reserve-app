@@ -6,8 +6,6 @@ import org.keycloak.KeycloakSecurityContext;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -65,9 +63,4 @@ public class WebUtil {
         return availableDurations;
     }
 
-    public static Date getDayAfterTomorrow() {
-        LocalDate localDate = LocalDate.now().plusDays(2);
-
-        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    }
 }

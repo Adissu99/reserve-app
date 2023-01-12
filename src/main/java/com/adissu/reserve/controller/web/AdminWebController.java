@@ -1,9 +1,12 @@
 package com.adissu.reserve.controller.web;
 
+import com.adissu.reserve.entity.CancelledReservation;
 import com.adissu.reserve.repository.AdminConfigRepository;
+import com.adissu.reserve.repository.CancelledReservationRepository;
 import com.adissu.reserve.repository.ClientRepository;
 import com.adissu.reserve.repository.ProductRepository;
 import com.adissu.reserve.service.AdminConfigService;
+import com.adissu.reserve.service.AdminService;
 import com.adissu.reserve.service.ClientService;
 import com.adissu.reserve.service.ProductService;
 import com.adissu.reserve.util.WebUtil;
@@ -16,8 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.security.RolesAllowed;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @Slf4j
@@ -30,6 +33,8 @@ public class AdminWebController {
     private final ProductService productService;
     private final AdminConfigService adminConfigService;
     private final ClientService clientService;
+    private final AdminService adminService;
+    private final CancelledReservationRepository cancelledReservationRepository;
 
     @GetMapping("/admin-index")
     @RolesAllowed("admin")
@@ -122,6 +127,31 @@ public class AdminWebController {
         }
 
         return "redirect:/admin/users";
+    }
+
+    @PostMapping("/admin/cancel-reservation")
+    @RolesAllowed("admin")
+    public String approveCancelRequest(Model model, @RequestParam("cancel-id") String cancelId) {
+        if( adminService.approveCancelRequest(cancelId).contains("ERROR") ) {
+            log.info("An error has occurred while trying to approve the cancel request.");
+        }
+
+        return "redirect:/admin/show-cancel-requests-form";
+    }
+
+    @GetMapping("/admin/show-cancel-requests-form")
+    @RolesAllowed("admin")
+    public String showCancelRequestsForm(Model model) {
+        Optional<List<CancelledReservation>> cancelledReservationList = cancelledReservationRepository.findAllByRequestedAndDone(true, false);
+        if( cancelledReservationList.isEmpty() || cancelledReservationList.get().size() == 0 ) {
+            log.info("List is empty.");
+            model.addAttribute("result", "LIST.EMPTY");
+        } else {
+            log.info("List is not empty and has size {}", cancelledReservationList.get().size());
+            model.addAttribute("result", "LIST.NOT_EMPTY");
+            model.addAttribute("cancelledReservationsList", cancelledReservationList.get());
+        }
+        return "/admin/cancel-requests";
     }
 
 }

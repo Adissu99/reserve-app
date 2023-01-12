@@ -9,11 +9,11 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Reservation {
+@Builder
+@Data
+public class CancelledReservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,10 +21,13 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Client client;
-    @ManyToOne
-    private Product product;
-    private Date selectedDate;
-    private String selectedTime;
-    private boolean requestedCancellation;
+
+    private Date reservationDate;
+    private String reservationHour;
+    private String reservationProduct;
+
+    private Date cancelDate;
+    private boolean requested;
+    private boolean done;
 
 }

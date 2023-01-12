@@ -17,4 +17,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     Optional<List<Reservation>> findAllBySelectedDate(@Param("selectedDate") Date selectedDate);
 
     Optional<List<Reservation>> findAllByClient_Email(String email);
+    Optional<Reservation> findBySelectedDateAndSelectedTime(Date selectedDate, String selectedTime);
 }

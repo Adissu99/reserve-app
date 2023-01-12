@@ -2,14 +2,8 @@ package com.adissu.reserve.service;
 
 import com.adissu.reserve.dto.ClientDTO;
 import com.adissu.reserve.dto.MailDTO;
-import com.adissu.reserve.entity.Client;
-import com.adissu.reserve.entity.InviteCode;
-import com.adissu.reserve.entity.MailActivation;
-import com.adissu.reserve.entity.Reservation;
-import com.adissu.reserve.repository.ClientRepository;
-import com.adissu.reserve.repository.InviteCodeRepository;
-import com.adissu.reserve.repository.MailActivationRepository;
-import com.adissu.reserve.repository.ReservationRepository;
+import com.adissu.reserve.entity.*;
+import com.adissu.reserve.repository.*;
 import com.adissu.reserve.util.ClientUtil;
 import com.adissu.reserve.util.InviteCodeUtil;
 import com.adissu.reserve.util.MailUtil;
@@ -31,6 +25,7 @@ public class ClientService {
     private final MailActivationRepository mailActivationRepository;
     private final ReservationRepository reservationRepository;
     private final InviteCodeRepository inviteCodeRepository;
+    private final CancelledReservationRepository cancelledReservationRepository;
     private final ClientUtil clientUtil;
     private final MailUtil mailUtil;
     private final InviteCodeUtil inviteCodeUtil;
@@ -211,5 +206,15 @@ public class ClientService {
         client.get().setRole("admin");
         clientRepository.save(client.get());
         return "SUCCESS";
+    }
+
+    public List<CancelledReservation> getCancelledReservations(String email) {
+        Client client = getClient(email);
+        Optional<List<CancelledReservation>> cancelledReservationOptional = cancelledReservationRepository.findAllByClient_Id(client.getId());
+        if( cancelledReservationOptional.isEmpty() ) {
+            return null;
+        }
+
+        return cancelledReservationOptional.get();
     }
 }

@@ -1,11 +1,15 @@
 package com.adissu.reserve.service;
 
+import com.adissu.reserve.entity.CancelledReservation;
 import com.adissu.reserve.entity.Client;
 import com.adissu.reserve.entity.Product;
 import com.adissu.reserve.entity.Reservation;
+import com.adissu.reserve.repository.CancelledReservationRepository;
 import com.adissu.reserve.repository.ClientRepository;
 import com.adissu.reserve.repository.ProductRepository;
 import com.adissu.reserve.repository.ReservationRepository;
+import com.adissu.reserve.util.DateUtil;
+import com.adissu.reserve.util.MailUtil;
 import com.adissu.reserve.util.ReserveUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +28,8 @@ public class ReservationService {
     private final ProductRepository productRepository;
     private final ClientRepository clientRepository;
     private final ReserveUtil reserveUtil;
+    private final MailUtil mailUtil;
+    private final CancelledReservationRepository cancelledReservationRepository;
 
     @Deprecated
     public boolean reserve(final Product product, final Client client, final Date selectedDate, final String selectedTime) {
@@ -41,6 +47,7 @@ public class ReservationService {
                 .client(client)
                 .selectedDate(new Date())
                 .selectedTime(selectedTime)
+                .requestedCancellation(false)
                 .build();
 
         reservationRepository.save(reservation);
@@ -119,6 +126,7 @@ public class ReservationService {
                 .selectedDate(selectedDate)
                 .client(client.get())
                 .product(product)
+                .requestedCancellation(false)
                 .build();
 
         reservationRepository.save(reservation);
@@ -128,12 +136,55 @@ public class ReservationService {
 
     public String cancelReservation(final String reservationId) {
         int reserveId = Integer.parseInt(reservationId);
-
-        if( !reservationRepository.existsById(reserveId) ) {
+        Optional<Reservation> reservation = reservationRepository.findById(reserveId);
+        if( reservation.isEmpty() ) {
             return "FAIL";
         }
 
-        reservationRepository.deleteById(reserveId);
+        CancelledReservation cancelledReservation = CancelledReservation.builder()
+                .client(reservation.get().getClient())
+                .reservationDate(reservation.get().getSelectedDate())
+                .reservationHour(reservation.get().getSelectedTime())
+                .reservationProduct(reservation.get().getProduct().getProductName())
+                .cancelDate(DateUtil.getDateWithoutTimeFromToday(0))
+                .done(true)
+                .requested(false)
+                .build();
+        cancelledReservationRepository.save(cancelledReservation);
+
+        reservationRepository.delete(reservation.get());
+        log.info("Cancelled reservation.");
+
+        return "SUCCESS";
+    }
+
+    public String requestCancelReservation(final String reservationId) {
+        int reserveId = Integer.parseInt(reservationId);
+
+        Optional<Reservation> reservation = reservationRepository.findById(reserveId);
+        if( reservation.isEmpty() ) {
+            return "FAIL";
+        }
+
+        // send mail to admins
+        mailUtil.sendRequestCancelReservation(reservation.get());
+
+        // mark it as requested
+        CancelledReservation cancelledReservation = CancelledReservation.builder()
+                .client(reservation.get().getClient())
+                .reservationDate(reservation.get().getSelectedDate())
+                .reservationHour(reservation.get().getSelectedTime())
+                .reservationProduct(reservation.get().getProduct().getProductName())
+                .cancelDate(DateUtil.getDateWithoutTimeFromToday(0))
+                .done(false)
+                .requested(true)
+                .build();
+        cancelledReservationRepository.save(cancelledReservation);
+        reservation.get().setRequestedCancellation(true);
+        reservationRepository.save(reservation.get());
+
+        log.info("Saved request for cancellation.");
+
         return "SUCCESS";
     }
 }

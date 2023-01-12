@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form name="cancel-reservations" method="post" action="#" th:action="@{/admin/cancel-reservation}">
+    <table style="border-spacing: 30px" th:if="${result.equals('LIST.NOT_EMPTY')}">
+        <tr>
+            <td><b>Client Name</b></td>
+            <td><b>Requested Cancelling Date</b></td>
+            <td><b>Reservation Date</b></td>
+            <td><b>Reservation Hour</b></td>
+            <td><b>Product</b></td>
+            <td><b>Approve</b></td>
+        </tr>
+        <tr th:each="cancel : ${cancelledReservationsList}">
+            <td th:text="${cancel.getClient().firstName + ' ' + cancel.getClient().lastName}"></td>
+            <td th:text="${cancel.getCancelDate()}"></td>
+            <td th:text="${cancel.getReservationDate()}"></td>
+            <td th:text="${cancel.getReservationHour()}"></td>
+            <td th:text="${cancel.getReservationProduct()}"></td>
+            <td><button type="submit" name="cancel-id" th:value="${cancel.getId()}">Approve</button></td>
+        </tr>
+    </table>
+    <h2 th:if="${result.equals('LIST.EMPTY')}">There are no requests for cancellation at the moment.</h2>
+</form>
+</body>
+</html>

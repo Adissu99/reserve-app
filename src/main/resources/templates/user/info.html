@@ -72,11 +72,21 @@
                 <td><b>Starting hour</b></td>
                 <td><b>Cancel</b></td>
             </tr>
-            <tr th:each="reservation : ${reservationList}" th:if="${reservation.getSelectedDate().after(dayAfterTomorrowDate) || reservation.getSelectedDate().equals(dayAfterTomorrowDate)}">
+            <tr th:each="reservation : ${reservationList}" th:if="${reservation.getSelectedDate().after(yesterdayDate)}">
                 <td th:text="${reservation.getProduct().getProductName()}"></td>
                 <td th:text="${#dates.format(reservation.getSelectedDate(), 'dd-MM-yyyy')}"></td>
                 <td th:text="${reservation.getSelectedTime()}"></td>
-                <td><button type="submit" th:value="${reservation.getId()}" name="cancelButton">Cancel Me</button></td>
+                <td th:if="${reservation.getSelectedDate().after(tomorrowDate)}">
+                    <button type="submit" th:value="${reservation.getId()}" name="cancelButton">Cancel Me</button>
+                </td>
+                <td th:unless="${reservation.getSelectedDate().after(tomorrowDate)}">
+                    <th:block th:if="${reservation.isRequestedCancellation()}">
+                        Requested for cancellation
+                    </th:block>
+                    <th:block th:unless="${reservation.isRequestedCancellation()}">
+                        <button type="submit" th:value="${reservation.getId()}" name="requestCancelButton">Request Cancellation</button>
+                    </th:block>
+                </td>
             </tr>
         </table>
     </th:block>
