@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.security.RolesAllowed;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,8 +46,9 @@ public class AdminWebController {
     @GetMapping("/admin/users")
     @RolesAllowed("admin")
     public String showUsers(Model model) {
+        List<Client> allClients = clientRepository.findAll();
         List<Client> invitedClients = adminService.getInvitedUsersList();
-
+        HashMap<Integer, Integer> cancelledReservationsMap = adminService.getCancelledReservationsUsers(allClients);
         String result = (String) model.getAttribute("result");
         List<Client> userChainList = (List<Client>) model.getAttribute("userChainList");
 
@@ -56,6 +58,7 @@ public class AdminWebController {
         model.addAttribute("invitedClients", invitedClients);
         model.addAttribute("result", result);
         model.addAttribute("userChainList", userChainList);
+        model.addAttribute("cancelledReservationsMap", cancelledReservationsMap);
         return "/admin/users";
     }
 

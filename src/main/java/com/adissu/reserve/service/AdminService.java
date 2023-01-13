@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,6 +86,17 @@ public class AdminService {
 
     public List<Client> getInvitedUsersList() {
         return clientRepository.findAllByCodeUsedToRegisterIsNot("ADMIN");
+    }
+
+    public HashMap<Integer, Integer> getCancelledReservationsUsers(List<Client> clientList) {
+        HashMap<Integer, Integer> cancelledReservationsMap = new HashMap<>();
+
+        for( Client client : clientList ) {
+            List<CancelledReservation> cancelledReservations = cancelledReservationRepository.findAllByClient_Id(client.getId());
+            cancelledReservationsMap.put(client.getId(), cancelledReservations.size());
+        }
+
+        return cancelledReservationsMap;
     }
 
 }

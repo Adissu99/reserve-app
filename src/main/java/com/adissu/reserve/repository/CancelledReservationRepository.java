@@ -11,8 +11,7 @@ import java.util.Optional;
 @Repository
 public interface CancelledReservationRepository extends JpaRepository<CancelledReservation, Integer> {
 
-    Optional<CancelledReservation> findByReservationDateAndReservationHour(Date reservationDate, String reservationHour);
-    Optional<List<CancelledReservation>> findAllByClient_Id(int clientId);
+    List<CancelledReservation> findAllByClient_Id(int clientId);
     Optional<List<CancelledReservation>> findAllByRequestedAndDone(boolean requested, boolean done);
 
 }

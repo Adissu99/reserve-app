@@ -198,11 +198,12 @@ public class ClientService {
 
     public List<CancelledReservation> getCancelledReservations(String email) {
         Client client = getClient(email);
-        Optional<List<CancelledReservation>> cancelledReservationOptional = cancelledReservationRepository.findAllByClient_Id(client.getId());
+        List<CancelledReservation> cancelledReservationOptional = cancelledReservationRepository.findAllByClient_Id(client.getId());
         if( cancelledReservationOptional.isEmpty() ) {
             return null;
         }
 
-        return cancelledReservationOptional.get();
+        return cancelledReservationOptional;
     }
+
 }
