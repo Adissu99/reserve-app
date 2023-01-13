@@ -196,18 +196,6 @@ public class ClientService {
         return client.get();
     }
 
-    public String makeAdmin(String clientId) {
-        Optional<Client> client = clientRepository.findById(Integer.parseInt(clientId));
-        if( client.isEmpty() ) {
-            return "ERROR.NOT_FOUND";
-        }
-
-        keyCloakService.makeAdmin(client.get().getEmail());
-        client.get().setRole("admin");
-        clientRepository.save(client.get());
-        return "SUCCESS";
-    }
-
     public List<CancelledReservation> getCancelledReservations(String email) {
         Client client = getClient(email);
         Optional<List<CancelledReservation>> cancelledReservationOptional = cancelledReservationRepository.findAllByClient_Id(client.getId());

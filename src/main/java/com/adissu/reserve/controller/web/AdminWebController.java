@@ -1,13 +1,13 @@
 package com.adissu.reserve.controller.web;
 
 import com.adissu.reserve.entity.CancelledReservation;
+import com.adissu.reserve.entity.Client;
 import com.adissu.reserve.repository.AdminConfigRepository;
 import com.adissu.reserve.repository.CancelledReservationRepository;
 import com.adissu.reserve.repository.ClientRepository;
 import com.adissu.reserve.repository.ProductRepository;
 import com.adissu.reserve.service.AdminConfigService;
 import com.adissu.reserve.service.AdminService;
-import com.adissu.reserve.service.ClientService;
 import com.adissu.reserve.service.ProductService;
 import com.adissu.reserve.util.WebUtil;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.security.RolesAllowed;
 import java.util.List;
@@ -32,7 +33,6 @@ public class AdminWebController {
     private final AdminConfigRepository adminConfigRepository;
     private final ProductService productService;
     private final AdminConfigService adminConfigService;
-    private final ClientService clientService;
     private final AdminService adminService;
     private final CancelledReservationRepository cancelledReservationRepository;
 
@@ -45,7 +45,17 @@ public class AdminWebController {
     @GetMapping("/admin/users")
     @RolesAllowed("admin")
     public String showUsers(Model model) {
+        List<Client> invitedClients = adminService.getInvitedUsersList();
+
+        String result = (String) model.getAttribute("result");
+        List<Client> userChainList = (List<Client>) model.getAttribute("userChainList");
+
+        log.info("Got result = {}; and List of size {}", result, userChainList != null ? userChainList.size() : "null");
+
         model.addAttribute("users", clientRepository.findAll());
+        model.addAttribute("invitedClients", invitedClients);
+        model.addAttribute("result", result);
+        model.addAttribute("userChainList", userChainList);
         return "/admin/users";
     }
 
@@ -121,8 +131,8 @@ public class AdminWebController {
 
     @PostMapping("/admin/make-admin")
     @RolesAllowed("admin")
-    public String makeSomeoneAdmin(Model model, @RequestParam("userIdAdmin") String id) {
-        if( clientService.makeAdmin(id).contains("ERROR") ) {
+    public String makeSomeoneAdmin(@RequestParam("userIdAdmin") String id) {
+        if( adminService.makeAdmin(id).contains("ERROR") ) {
             log.info("An error has occurred while trying to make user with id {} an admin.", id);
         }
 
@@ -131,7 +141,7 @@ public class AdminWebController {
 
     @PostMapping("/admin/cancel-reservation")
     @RolesAllowed("admin")
-    public String approveCancelRequest(Model model, @RequestParam("cancel-id") String cancelId) {
+    public String approveCancelRequest(@RequestParam("cancel-id") String cancelId) {
         if( adminService.approveCancelRequest(cancelId).contains("ERROR") ) {
             log.info("An error has occurred while trying to approve the cancel request.");
         }
@@ -152,6 +162,18 @@ public class AdminWebController {
             model.addAttribute("cancelledReservationsList", cancelledReservationList.get());
         }
         return "/admin/cancel-requests";
+    }
+
+    @GetMapping("/admin/user-chain")
+    @RolesAllowed("admin")
+    public String getUserChain(RedirectAttributes redirectAttributes, @RequestParam("selected-user-id") String selectedUserId) {
+        List<Client> userChainList = adminService.getClientInvitedChain(selectedUserId);
+        String result = userChainList.isEmpty() ? "ERROR.NOT_FOUND" : "SUCCESS.CHAIN";
+
+        redirectAttributes.addFlashAttribute("userChainList", userChainList);
+        redirectAttributes.addFlashAttribute("result", result);
+
+        return "redirect:/admin/users";
     }
 
 }

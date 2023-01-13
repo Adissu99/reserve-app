@@ -1,16 +1,19 @@
 package com.adissu.reserve.service;
 
 import com.adissu.reserve.entity.CancelledReservation;
+import com.adissu.reserve.entity.Client;
+import com.adissu.reserve.entity.InviteCode;
 import com.adissu.reserve.entity.Reservation;
 import com.adissu.reserve.repository.CancelledReservationRepository;
+import com.adissu.reserve.repository.ClientRepository;
+import com.adissu.reserve.repository.InviteCodeRepository;
 import com.adissu.reserve.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +23,9 @@ public class AdminService {
 
     private final CancelledReservationRepository cancelledReservationRepository;
     private final ReservationRepository reservationRepository;
+    private final ClientRepository clientRepository;
+    private final InviteCodeRepository inviteCodeRepository;
+    private final KeyCloakService keyCloakService;
 
     public String approveCancelRequest(final String cancelId) {
 
@@ -43,6 +49,42 @@ public class AdminService {
 
         log.info("Successfully cancelled reservation.");
         return "SUCCESS";
+    }
+
+    public String makeAdmin(String clientId) {
+        Optional<Client> client = clientRepository.findById(Integer.parseInt(clientId));
+        if( client.isEmpty() ) {
+            return "ERROR.NOT_FOUND";
+        }
+
+        keyCloakService.makeAdmin(client.get().getEmail());
+        client.get().setRole("admin");
+        clientRepository.save(client.get());
+        return "SUCCESS";
+    }
+
+    public List<Client> getClientInvitedChain(String clientId) {
+        Optional<Client> clientOptional = clientRepository.findById(Integer.parseInt(clientId));
+        if( clientOptional.isEmpty() ) {
+            log.info("Client with id {} could not be found.", clientId);
+            return new ArrayList<>();
+        }
+
+        String invCode = clientOptional.get().getCodeUsedToRegister();
+        Optional<InviteCode> inviteCodeOptional = inviteCodeRepository.findByInvCode(invCode);
+        List<Client> clientList = new ArrayList<>();
+
+        while( inviteCodeOptional.isPresent() ) {
+            clientList.add(inviteCodeOptional.get().getClient());
+            invCode = inviteCodeOptional.get().getClient().getCodeUsedToRegister();
+            inviteCodeOptional = inviteCodeRepository.findByInvCode(invCode);
+        }
+
+        return clientList;
+    }
+
+    public List<Client> getInvitedUsersList() {
+        return clientRepository.findAllByCodeUsedToRegisterIsNot("ADMIN");
     }
 
 }

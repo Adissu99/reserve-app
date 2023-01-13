@@ -37,6 +37,36 @@
             </div>
         </div>
     </form>
+
+    <form name="check-user-chain" action="#" method="get" th:action="@{/admin/user-chain}">
+        <h2>Trace the invitation chain for the invited users</h2>
+        <th:block th:if="${!invitedClients.isEmpty()}">
+            <select name="selected-user-id" id="selected-user-id">
+                <option value="none">Please select a user from the list</option>
+                <th:block th:each="user : ${users}">
+                    <option th:if="${!user.getCodeUsedToRegister().equals('ADMIN')}" th:value="${user.getId()}" th:text="${user.getEmail()}"></option>
+                </th:block>
+            </select>
+            <button type="submit" name="submitUserRootButton">Check user invite tree</button>
+        </th:block>
+        <th:block th:if="${invitedClients.isEmpty()}">
+            <h4>There are no users registered using an invite code.</h4>
+        </th:block>
+    </form>
+
+    <form name="invited-clients-chain" th:if="${result != null && result.equals('SUCCESS.CHAIN')}">
+        <table style="border-spacing: 30px">
+            <tr>
+                <td>Full Name</td>
+                <td>Email</td>
+            </tr>
+            <tr th:each="invUser : ${userChainList}">
+                <td th:text="${invUser.getFirstName() + ' ' + invUser.getLastName()}"></td>
+                <td th:text="${invUser.getEmail()}"></td>
+            </tr>
+        </table>
+    </form>
+
     <form name="go-back" action="#" method="get" th:action="@{/admin-index}">
         <button type="submit">Go back to Admin Portal</button>
     </form>

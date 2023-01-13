@@ -13,5 +13,6 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
     Optional<Client> getByEmail(String email);
     Optional<List<Client>> findAllByCodeUsedToRegisterIsIn(List<String> codes);
     List<Client> findAllByRole(String role);
+    List<Client> findAllByCodeUsedToRegisterIsNot(String adminInvCode);
 
 }
