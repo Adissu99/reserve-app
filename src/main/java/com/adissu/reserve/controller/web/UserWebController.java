@@ -1,12 +1,12 @@
 package com.adissu.reserve.controller.web;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.entity.Client;
 import com.adissu.reserve.entity.InviteCode;
 import com.adissu.reserve.entity.Product;
 import com.adissu.reserve.entity.Reservation;
 import com.adissu.reserve.service.ClientService;
 import com.adissu.reserve.service.InviteCodeService;
-import com.adissu.reserve.service.ProductService;
 import com.adissu.reserve.service.ReservationService;
 import com.adissu.reserve.util.DateUtil;
 import com.adissu.reserve.util.WebUtil;
@@ -32,7 +32,6 @@ import java.util.Optional;
 public class UserWebController {
 
     private final ReservationService reservationService;
-    private final ProductService productService;
     private final ClientService clientService;
     private final InviteCodeService inviteCodeService;
     private final List<Product> productList;
@@ -62,10 +61,10 @@ public class UserWebController {
         model.addAttribute("productList", productList);
 
         if( freeTimeAvailable.isEmpty() ) {
-            model.addAttribute("result", "FULL_DAY");
+            model.addAttribute("result", ResultConstants.FULL_DAY);
         } else {
             model.addAttribute("freeTimeList", freeTimeAvailable);
-            model.addAttribute("result", "AVAILABLE");
+            model.addAttribute("result", ResultConstants.AVAILABLE);
         }
         model.addAttribute("alreadySelectedDate", selectedDate);
         model.addAttribute("alreadySelectedProduct", productName);
@@ -99,7 +98,7 @@ public class UserWebController {
 
     @GetMapping("/after-reserve")
     @RolesAllowed({"client", "admin"})
-    public String handleAfterReserve(@RequestParam("submitButton") String destination, Model model, HttpServletRequest httpServletRequest) {
+    public String handleAfterReserve(@RequestParam("submitButton") String destination, Model model) {
         String page = "";
         switch (destination) {
             case "info":
@@ -164,9 +163,9 @@ public class UserWebController {
 
         model.addAttribute("inviteCodes", inviteCodes);
         if( inviteCode.isEmpty() ) {
-            model.addAttribute("result", "ERROR");
+            model.addAttribute("result", ResultConstants.ERROR_NOT_FOUND);
         } else {
-            model.addAttribute("result", "SUCCESS");
+            model.addAttribute("result", ResultConstants.SUCCESS);
             model.addAttribute("inviteCode", inviteCode.get().getInvCode());
         }
 
@@ -177,7 +176,7 @@ public class UserWebController {
     @RolesAllowed("client")
     public String cancelReservation(@RequestParam(value = "cancelButton", required = false) String cancelButtonId, @RequestParam(value = "requestCancelButton", required = false) String requestCancelButtonId) {
         log.info("Got cancelButtonId {}; requestCancelButtonId {} from input", cancelButtonId, requestCancelButtonId);
-        String result = "";
+        String result;
         if( cancelButtonId == null || cancelButtonId.isBlank() ) {
             result = reservationService.requestCancelReservation(requestCancelButtonId);
             log.info("Result from requested cancelling reservation {}", result);

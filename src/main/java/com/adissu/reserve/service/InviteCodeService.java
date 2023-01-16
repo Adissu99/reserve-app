@@ -68,13 +68,13 @@ public class InviteCodeService {
     }
 
     public List<InviteCode> getInviteCodes(String email) {
-        Optional<List<InviteCode>> optionalInviteCodes = inviteCodeRepository.findAllByClient_Email(email);
+        List<InviteCode> optionalInviteCodes = inviteCodeRepository.findAllByClient_Email(email);
 
         if( optionalInviteCodes.isEmpty() ) {
             return null;
         }
 
-        return optionalInviteCodes.get();
+        return optionalInviteCodes;
     }
 
 }

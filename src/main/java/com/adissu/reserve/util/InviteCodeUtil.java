@@ -18,6 +18,9 @@ public class InviteCodeUtil {
     private final AESUtil aesUtil;
 
     public Boolean isInviteCodeValid(String invCode) {
+        if( invCode == null ) {
+            return null;
+        }
 
         if( !invCode.equals("ADMIN") ) {
             Optional<InviteCode> inviteCodeOptional = inviteCodeRepository.findByInvCode(invCode);

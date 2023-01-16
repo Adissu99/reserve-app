@@ -1,5 +1,6 @@
 package com.adissu.reserve.service;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.entity.CancelledReservation;
 import com.adissu.reserve.entity.Client;
 import com.adissu.reserve.entity.InviteCode;
@@ -33,13 +34,13 @@ public class AdminService {
         Optional<CancelledReservation> cancelledReservationOptional = cancelledReservationRepository.findById(Integer.parseInt(cancelId));
         if( cancelledReservationOptional.isEmpty() ) {
             log.info("Cancel request not found for id {}", cancelId);
-            return "ERROR.NOT_FOUND";
+            return ResultConstants.ERROR_NOT_FOUND;
         }
 
         Optional<Reservation> reservation = reservationRepository.findBySelectedDateAndSelectedTime(cancelledReservationOptional.get().getReservationDate(), cancelledReservationOptional.get().getReservationHour());
         if( reservation.isEmpty() ) {
             log.info("Could not find reservation made on date {} and hour {}", cancelledReservationOptional.get().getReservationDate(), cancelledReservationOptional.get().getReservationHour());
-            return "ERROR.NOT_FOUND";
+            return ResultConstants.ERROR_NOT_FOUND;
         }
 
         CancelledReservation cancelledReservation = cancelledReservationOptional.get();
@@ -49,19 +50,19 @@ public class AdminService {
         reservationRepository.delete(reservation.get());
 
         log.info("Successfully cancelled reservation.");
-        return "SUCCESS";
+        return ResultConstants.SUCCESS;
     }
 
     public String makeAdmin(String clientId) {
         Optional<Client> client = clientRepository.findById(Integer.parseInt(clientId));
         if( client.isEmpty() ) {
-            return "ERROR.NOT_FOUND";
+            return ResultConstants.ERROR_NOT_FOUND;
         }
 
         keyCloakService.makeAdmin(client.get().getEmail());
         client.get().setRole("admin");
         clientRepository.save(client.get());
-        return "SUCCESS";
+        return ResultConstants.SUCCESS;
     }
 
     public List<Client> getClientInvitedChain(String clientId) {

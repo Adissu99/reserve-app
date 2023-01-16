@@ -27,7 +27,7 @@
     <label for="selected-date" id="label-date">Select a date to see available hours:</label>
     <input type="date" id="selected-date" name="selected-date" onchange="showSubmitCheckTime()">
 
-      <div th:if="${result != null && result.equals('AVAILABLE')}">
+      <div th:if="${result != null && result.equals(T(com.adissu.reserve.constants.ResultConstants).AVAILABLE)}">
         <select name="selected-hour" id="selected-hour" onchange="showSubmitReserve()">
             <option value="none">Selected an available hour</option>
             <div th:each="hour : ${freeTimeList}">

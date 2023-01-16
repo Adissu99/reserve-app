@@ -14,8 +14,8 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
 
     @Query("SELECT r FROM Reservation r WHERE date(r.selectedDate) = :selectedDate")
-    Optional<List<Reservation>> findAllBySelectedDate(@Param("selectedDate") Date selectedDate);
+    List<Reservation> findAllBySelectedDate(@Param("selectedDate") Date selectedDate);
 
-    Optional<List<Reservation>> findAllByClient_Email(String email);
+    List<Reservation> findAllByClient_Email(String email);
     Optional<Reservation> findBySelectedDateAndSelectedTime(Date selectedDate, String selectedTime);
 }

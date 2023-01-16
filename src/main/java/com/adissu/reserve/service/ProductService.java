@@ -1,5 +1,6 @@
 package com.adissu.reserve.service;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.dto.ProductDTO;
 import com.adissu.reserve.entity.Product;
 import com.adissu.reserve.repository.ProductRepository;
@@ -20,11 +21,11 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final List<Product> productList;
 
-    public boolean insertNewProduct(final ProductDTO productDTO) {
+    public String insertNewProduct(final ProductDTO productDTO) {
         log.info("Validating product: {}", productDTO);
         if( productDTO.getProductName() == null || productDTO.getProductName().isBlank() || productDTO.getDurationInMinutes() == 0) {
             log.info("Product is invalid.");
-            return false;
+            return ResultConstants.ERROR_INVALID;
         }
 
         log.info("Product is valid. Trying to insert now..");
@@ -39,10 +40,10 @@ public class ProductService {
 
         log.info("Added product with name {}; duration {}; id {}; to the list.", product.getProductName(), product.getDurationInMinutes(), product.getId());
 
-        return true;
+        return ResultConstants.SUCCESS;
     }
 
-    public boolean insertNewProduct(String name, final String duration) {
+    public String insertNewProduct(String name, final String duration) {
         name = StringUtils.capitalize(name.toLowerCase());
 
         ProductDTO productDTO = ProductDTO.builder()
@@ -53,12 +54,12 @@ public class ProductService {
         return insertNewProduct(productDTO);
     }
 
-    public boolean modifyExistingProduct(final String id, final String duration, String name) {
+    public String modifyExistingProduct(final String id, final String duration, String name) {
         Optional<Product> productOptional = productRepository.findById(Integer.parseInt(id));
 
         if( productOptional.isEmpty() ) {
             log.info("Could not find product with id = {}", id);
-            return false;
+            return ResultConstants.ERROR_NOT_FOUND;
         }
 
         Product product = productOptional.get();
@@ -85,7 +86,7 @@ public class ProductService {
 
         log.info("modifyExistingProduct - modified the product");
 
-        return true;
+        return ResultConstants.SUCCESS;
     }
 
     public List<Product> getAllProducts() {

@@ -1,5 +1,6 @@
 package com.adissu.reserve.service;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.entity.AdminConfig;
 import com.adissu.reserve.repository.AdminConfigRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class AdminConfigService {
     public String modifyValueForConfig(String configName, String value) {
         Optional<AdminConfig> configOptional = configRepository.findByName(configName);
         if( configOptional.isEmpty() ) {
-            return "ERROR";
+            return ResultConstants.ERROR_EMPTY;
         }
 
         AdminConfig config = configOptional.get();
@@ -41,15 +42,15 @@ public class AdminConfigService {
                 .findFirst()
                 .get().setValue(value);
 
-        return "SUCCESS";
+        return ResultConstants.SUCCESS;
     }
 
     public String addNewConfig(String configName, String value) {
         if( configName == null || configName.equals("") ) {
-            return "EMPTY.NAME";
+            return ResultConstants.ERROR_EMPTY_NAME;
         }
         if( value == null || value.equals("") ) {
-            return "EMPTY.VALUE";
+            return ResultConstants.ERROR_EMPTY_VALUE;
         }
 
         AdminConfig adminConfig = AdminConfig.builder()
@@ -61,6 +62,6 @@ public class AdminConfigService {
 
         adminConfigList.add(adminConfig);
 
-        return "SUCCESS";
+        return ResultConstants.SUCCESS;
     }
 }

@@ -1,5 +1,6 @@
 package com.adissu.reserve.service;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.entity.CancelledReservation;
 import com.adissu.reserve.entity.Client;
 import com.adissu.reserve.entity.Product;
@@ -38,7 +39,7 @@ public class ReservationService {
         return true;
     }
 
-    public boolean reserveTest(final int productId, final int clientId, final String selectedTime) {
+    public String reserveTest(final int productId, final int clientId, final String selectedTime) {
         log.info("Got the following parameters: ProductId = {} ; ClientId = {} ; SelectedTime = {}", productId, clientId, selectedTime);
         Product product = productRepository.findById(productId).get();
         Client client = clientRepository.findById(clientId).get();
@@ -52,7 +53,7 @@ public class ReservationService {
 
         reservationRepository.save(reservation);
 
-        return true;
+        return ResultConstants.SUCCESS;
     }
 
     public List<String> getFreeTimeForDate(final String date, final String productName) {
@@ -66,16 +67,15 @@ public class ReservationService {
 
 
         log.info("Received date {} and product name {}", date, productName);
-        Optional<List<Reservation>> reservationsOptional = reservationRepository.findAllBySelectedDate(selectedDate);
+        List<Reservation> reservationsOptional = reservationRepository.findAllBySelectedDate(selectedDate);
         List<Product> productList = productRepository.findAll();
 
         if( reservationsOptional.isEmpty() ) {
             return reserveUtil.getFreeDay();
         }
 
-        List<Reservation> reservationList = reservationsOptional.get();
         HashMap<String, Integer> occupiedHoursWithDuration = new HashMap<>();
-        for (Reservation reservation : reservationList) {
+        for (Reservation reservation : reservationsOptional) {
             occupiedHoursWithDuration.put(reservation.getSelectedTime(), reservation.getProduct().getDurationInMinutes());
         }
 
@@ -112,13 +112,13 @@ public class ReservationService {
         Optional<Client> client = clientRepository.getByEmail(clientName);
         if( client.isEmpty() ) {
             log.info("Client {} does not exist.", clientName);
-            return "FAIL.CLIENT";
+            return ResultConstants.ERROR_NOT_FOUND;
         }
 
         Product product = productRepository.findByProductName(productName);
         if( product == null ) {
             log.info("Product {} does not exist.", productName);
-            return "FAIL.PRODUCT";
+            return ResultConstants.ERROR_NOT_FOUND;
         }
 
         Reservation reservation = Reservation.builder()
@@ -131,14 +131,14 @@ public class ReservationService {
 
         reservationRepository.save(reservation);
 
-        return "SUCCESS";
+        return ResultConstants.SUCCESS;
     }
 
     public String cancelReservation(final String reservationId) {
         int reserveId = Integer.parseInt(reservationId);
         Optional<Reservation> reservation = reservationRepository.findById(reserveId);
         if( reservation.isEmpty() ) {
-            return "FAIL";
+            return ResultConstants.ERROR_NOT_FOUND;
         }
 
         CancelledReservation cancelledReservation = CancelledReservation.builder()
@@ -155,7 +155,7 @@ public class ReservationService {
         reservationRepository.delete(reservation.get());
         log.info("Cancelled reservation.");
 
-        return "SUCCESS";
+        return ResultConstants.SUCCESS;
     }
 
     public String requestCancelReservation(final String reservationId) {
@@ -163,7 +163,7 @@ public class ReservationService {
 
         Optional<Reservation> reservation = reservationRepository.findById(reserveId);
         if( reservation.isEmpty() ) {
-            return "FAIL";
+            return ResultConstants.ERROR_NOT_FOUND;
         }
 
         // send mail to admins
@@ -185,6 +185,6 @@ public class ReservationService {
 
         log.info("Saved request for cancellation.");
 
-        return "SUCCESS";
+        return ResultConstants.SUCCESS;
     }
 }

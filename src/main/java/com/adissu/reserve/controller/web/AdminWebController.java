@@ -1,5 +1,6 @@
 package com.adissu.reserve.controller.web;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.entity.CancelledReservation;
 import com.adissu.reserve.entity.Client;
 import com.adissu.reserve.repository.AdminConfigRepository;
@@ -22,7 +23,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.annotation.security.RolesAllowed;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @Slf4j
@@ -77,10 +77,10 @@ public class AdminWebController {
         log.info("handleProductModify - Got id: {}; name: {}; duration: {}; from input", id, name, duration);
 
         List<String> availableDurations = WebUtil.getAvailableDurationsForProducts();
-        boolean result = productService.modifyExistingProduct(id, duration, name);
+        String result = productService.modifyExistingProduct(id, duration, name);
         model.addAttribute("products", productRepository.findAll());
         model.addAttribute("availableDurations", availableDurations);
-        model.addAttribute("result", String.valueOf(result));
+        model.addAttribute("result", result);
 
         return "/admin/products";
     }
@@ -91,10 +91,10 @@ public class AdminWebController {
         log.info("handleProductInsert - Got name: {}; duration: {}; from input", name, duration);
 
         List<String> availableDurations = WebUtil.getAvailableDurationsForProducts();
-        boolean result = productService.insertNewProduct(name, duration);
+        String result = productService.insertNewProduct(name, duration);
         model.addAttribute("availableDurations", availableDurations);
         model.addAttribute("products", productRepository.findAll());
-        model.addAttribute("result", String.valueOf(result));
+        model.addAttribute("result", result);
 
         return "/admin/products";
     }
@@ -155,14 +155,14 @@ public class AdminWebController {
     @GetMapping("/admin/show-cancel-requests-form")
     @RolesAllowed("admin")
     public String showCancelRequestsForm(Model model) {
-        Optional<List<CancelledReservation>> cancelledReservationList = cancelledReservationRepository.findAllByRequestedAndDone(true, false);
-        if( cancelledReservationList.isEmpty() || cancelledReservationList.get().size() == 0 ) {
+        List<CancelledReservation> cancelledReservationList = cancelledReservationRepository.findAllByRequestedAndDone(true, false);
+        if( cancelledReservationList.size() == 0 ) {
             log.info("List is empty.");
-            model.addAttribute("result", "LIST.EMPTY");
+            model.addAttribute("result", ResultConstants.ERROR_LIST_EMPTY);
         } else {
-            log.info("List is not empty and has size {}", cancelledReservationList.get().size());
-            model.addAttribute("result", "LIST.NOT_EMPTY");
-            model.addAttribute("cancelledReservationsList", cancelledReservationList.get());
+            log.info("List is not empty and has size {}", cancelledReservationList.size());
+            model.addAttribute("result", ResultConstants.SUCCESS_LIST_NOT_EMPTY);
+            model.addAttribute("cancelledReservationsList", cancelledReservationList);
         }
         return "/admin/cancel-requests";
     }
@@ -171,7 +171,7 @@ public class AdminWebController {
     @RolesAllowed("admin")
     public String getUserChain(RedirectAttributes redirectAttributes, @RequestParam("selected-user-id") String selectedUserId) {
         List<Client> userChainList = adminService.getClientInvitedChain(selectedUserId);
-        String result = userChainList.isEmpty() ? "ERROR.NOT_FOUND" : "SUCCESS.CHAIN";
+        String result = userChainList.isEmpty() ? ResultConstants.ERROR_NOT_FOUND : ResultConstants.SUCCESS_CHAIN;
 
         redirectAttributes.addFlashAttribute("userChainList", userChainList);
         redirectAttributes.addFlashAttribute("result", result);

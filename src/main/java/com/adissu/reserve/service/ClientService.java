@@ -1,5 +1,6 @@
 package com.adissu.reserve.service;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.dto.ClientDTO;
 import com.adissu.reserve.dto.MailDTO;
 import com.adissu.reserve.entity.*;
@@ -62,7 +63,7 @@ public class ClientService {
                 .build();
         mailActivationRepository.save(mailActivation);
 
-        if (mailUtil.sendActivationMail(mailActivation)) {
+        if (mailUtil.sendActivationMail(mailActivation).equals(ResultConstants.SUCCESS)) {
             log.info("Email sent successfully!");
         } else {
             log.info("There was a problem sending the email.");
@@ -91,7 +92,7 @@ public class ClientService {
 
     // Test method
     public boolean sendMail(final MailDTO mailDTO) {
-        return mailUtil.sendMail(mailDTO);
+        return mailUtil.sendMail(mailDTO).equals(ResultConstants.SUCCESS);
     }
 
     // activate a user based on the email and the code
@@ -101,11 +102,11 @@ public class ClientService {
 
         Optional<MailActivation> mailActivationOptional = mailActivationRepository.getByActivationCodeAndEmail(code, email);
         if( mailActivationOptional.isEmpty() ) {
-            return "ERROR";
+            return ResultConstants.ERROR_NOT_FOUND;
         }
 
         if(mailActivationOptional.get().getActivated()) {
-            return "ACTIVATED";
+            return ResultConstants.ERROR_ALREADY_ACTIVATED;
         }
 
         log.info("Got mailActivation : {}", mailActivationOptional.get());
@@ -114,12 +115,11 @@ public class ClientService {
         mailActivationOptional.get().setActivated(true);
         mailActivationRepository.save(mailActivationOptional.get());
 
-        return "SUCCESS";
+        return ResultConstants.SUCCESS;
     }
 
     // resend activation mail. Username is the same as email
     public String resendMail(String email) {
-        String result = "";
         if( mailActivationRepository.existsByEmail(email) ) {
             mailActivationRepository.deleteByEmail(email);
 
@@ -131,28 +131,26 @@ public class ClientService {
                     .build();
             mailActivationRepository.save(mailActivation);
 
-            if (mailUtil.sendActivationMail(mailActivation)) {
+            if (mailUtil.sendActivationMail(mailActivation).equals(ResultConstants.SUCCESS)) {
                 log.info("Email resent successfully!");
-                result = "RESENT";
+                return ResultConstants.SUCCESS_RESENT;
             } else {
                 log.info("There was a problem resending the email.");
-                result = "ERROR.RESENDING";
+                return ResultConstants.ERROR_RESENDING;
             }
         } else {
             log.info("Email {} was not found.", email);
-            result = "NOT-FOUND";
+            return ResultConstants.ERROR_NOT_FOUND;
         }
-
-        return result;
     }
 
     public List<Client> getInvitedUsersList(String clientEmail) {
-        Optional<List<InviteCode>> optionalInviteCodeList = inviteCodeRepository.findAllByClient_Email(clientEmail);
+        List<InviteCode> optionalInviteCodeList = inviteCodeRepository.findAllByClient_Email(clientEmail);
         if( optionalInviteCodeList.isEmpty() ) {
             return null;
         }
 
-        Optional<List<Client>> optionalInvitedClientList = clientRepository.findAllByCodeUsedToRegisterIsIn(optionalInviteCodeList.get()
+        List<Client> optionalInvitedClientList = clientRepository.findAllByCodeUsedToRegisterIsIn(optionalInviteCodeList
                                                                                                                 .stream()
                                                                                                                 .map(InviteCode::getInvCode)
                                                                                                                 .collect(Collectors.toList()));
@@ -161,13 +159,17 @@ public class ClientService {
             return null;
         }
 
-        return optionalInvitedClientList.get();
+        return optionalInvitedClientList;
     }
 
     // HashMap<Email, isActivated?>
     public HashMap<String, Boolean> getClientsActivatedFromList(List<Client> clientsToCheck) {
+        if( clientsToCheck == null ) {
+            return new HashMap<>();
+        }
+
         HashMap<String, Boolean> clients = new HashMap<>();
-        boolean isActivated = false;
+        boolean isActivated;
         for( String email : clientsToCheck.stream().map(Client::getEmail).toList() ) {
             isActivated = mailActivationRepository.findByEmail(email).getActivated();
             clients.put(email, isActivated);
@@ -177,13 +179,13 @@ public class ClientService {
     }
 
     public List<Reservation> getReservationsMade(String clientEmail) {
-        Optional<List<Reservation>> reservationList = reservationRepository.findAllByClient_Email(clientEmail);
+        List<Reservation> reservationList = reservationRepository.findAllByClient_Email(clientEmail);
 
         if( reservationList.isEmpty() ) {
             return null;
         }
 
-        return reservationList.get();
+        return reservationList;
     }
 
     public Client getClient(String clientEmail) {
@@ -198,6 +200,10 @@ public class ClientService {
 
     public List<CancelledReservation> getCancelledReservations(String email) {
         Client client = getClient(email);
+        if( client == null ) {
+            return null;
+        }
+
         List<CancelledReservation> cancelledReservationOptional = cancelledReservationRepository.findAllByClient_Id(client.getId());
         if( cancelledReservationOptional.isEmpty() ) {
             return null;

@@ -1,5 +1,6 @@
 package com.adissu.reserve.controller.web;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.dto.ClientDTO;
 import com.adissu.reserve.service.ClientService;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class UnregisteredWebController {
     // show resend mail form
     @GetMapping("/resend-mail")
     public String resendMail(Model model) {
-        model.addAttribute("result", "RESEND");
+        model.addAttribute("result", ResultConstants.RESEND_FORM);
 
         return "/unregistered/handle-verification";
     }

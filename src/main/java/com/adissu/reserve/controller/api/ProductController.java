@@ -1,5 +1,6 @@
 package com.adissu.reserve.controller.api;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.dto.ProductDTO;
 import com.adissu.reserve.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class ProductController {
     @PostMapping(path = "new")
     @RolesAllowed("admin")
     public ResponseEntity<String> insertNewProduct(@RequestBody ProductDTO productDTO) {
-        if( !productService.insertNewProduct(productDTO) ) {
+        if( productService.insertNewProduct(productDTO).equals(ResultConstants.ERROR_INVALID) ) {
             return ResponseEntity.badRequest().body("Product is invalid.");
         }
 

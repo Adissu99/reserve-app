@@ -1,5 +1,6 @@
 package com.adissu.reserve.controller.api;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.dto.ReserveDTO;
 import com.adissu.reserve.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class ReservationController {
     @RolesAllowed({"client", "admin"})
     public ResponseEntity<String> reserve(@RequestBody ReserveDTO reserveDTO) {
 
-        if( !reservationService.reserveTest(reserveDTO.getProductId(), reserveDTO.getClientId(), reserveDTO.getSelectedTime()) ) {
+        if( !reservationService.reserveTest(reserveDTO.getProductId(), reserveDTO.getClientId(), reserveDTO.getSelectedTime()).equals(ResultConstants.SUCCESS) ) {
             return ResponseEntity.badRequest().body("Request is invalid.");
         }
 

@@ -56,7 +56,7 @@
         </th:block>
     </form>
 
-    <form name="invited-clients-chain" th:if="${result != null && result.equals('SUCCESS.CHAIN')}">
+    <form name="invited-clients-chain" th:if="${result != null && result.equals(T(com.adissu.reserve.constants.ResultConstants).SUCCESS_CHAIN)}">
         <table style="border-spacing: 30px">
             <tr>
                 <th>Full Name</th>

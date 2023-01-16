@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface InviteCodeRepository extends JpaRepository<InviteCode, Integer> {
 
-    public Optional<InviteCode> findByClient_Id(int clientId);
-    public Optional<InviteCode> findByInvCode(String invCode);
-    public Optional<List<InviteCode>> findAllByClient_Email(String email);
+    Optional<InviteCode> findByClient_Id(int clientId);
+    Optional<InviteCode> findByInvCode(String invCode);
+    List<InviteCode> findAllByClient_Email(String email);
 }

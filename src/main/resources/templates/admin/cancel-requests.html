@@ -24,7 +24,7 @@
             <td><button type="submit" name="cancel-id" th:value="${cancel.getId()}">Approve</button></td>
         </tr>
     </table>
-    <h2 th:if="${result.equals('LIST.EMPTY')}">There are no requests for cancellation at the moment.</h2>
+    <h2 th:if="${result.equals(T(com.adissu.reserve.constants.ResultConstants).ERROR_LIST_EMPTY)}">There are no requests for cancellation at the moment.</h2>
 </form>
 </body>
 </html>

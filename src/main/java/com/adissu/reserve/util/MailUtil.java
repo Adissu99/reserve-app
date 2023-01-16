@@ -1,5 +1,6 @@
 package com.adissu.reserve.util;
 
+import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.dto.MailDTO;
 import com.adissu.reserve.entity.Client;
 import com.adissu.reserve.entity.MailActivation;
@@ -25,9 +26,9 @@ public class MailUtil {
     private static final RandomString randomString = new RandomString(30);
     private final ClientRepository clientRepository;
 
-    public boolean sendMail(MailDTO mailDTO) {
+    public String sendMail(MailDTO mailDTO) {
         if (!validateMailDTO(mailDTO)) {
-            return false;
+            return ResultConstants.ERROR_INVALID;
         }
 
         SimpleMailMessage message = new SimpleMailMessage();
@@ -36,7 +37,7 @@ public class MailUtil {
         message.setText(mailDTO.getText());
 
         emailSender.send(message);
-        return true;
+        return ResultConstants.SUCCESS;
     }
 
     private String getActivationLink(MailActivation mailActivation) {
@@ -62,7 +63,7 @@ public class MailUtil {
         return true;
     }
 
-    public boolean sendActivationMail(MailActivation mailActivation) {
+    public String sendActivationMail(MailActivation mailActivation) {
         final String link = getActivationLink(mailActivation);
         MailDTO mailDTO = MailDTO.builder()
 //                .to(mailActivation.getEmail())
@@ -74,7 +75,7 @@ public class MailUtil {
         return sendMail(mailDTO);
     }
 
-    public boolean sendRequestCancelReservation(Reservation reservation) {
+    public String sendRequestCancelReservation(Reservation reservation) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Client client = reservation.getClient();
         String text = new StringBuilder()
@@ -87,7 +88,7 @@ public class MailUtil {
 
         if( adminsEmailList.isEmpty() ) {
             log.info("Admins Email List is empty.");
-            return false;
+            return ResultConstants.ERROR_LIST_EMPTY;
         }
 
         for( String adminEmail : adminsEmailList ) {
@@ -97,13 +98,13 @@ public class MailUtil {
                     .text(text)
                     .build();
 
-            if(!sendMail(mailDTO)) {
+            if(!sendMail(mailDTO).equals(ResultConstants.SUCCESS)) {
                 log.info("There was an error while trying to send emails to admins.");
-                return false;
+                return ResultConstants.ERROR_SENDING;
             }
         }
 
-        return true;
+        return ResultConstants.SUCCESS;
     }
 
     private List<String> getAdminsEmailList() {
