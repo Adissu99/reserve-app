@@ -3,43 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <title>Make your reservation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.1.0/mdb.min.css" rel="stylesheet"/>
+    <link type="text/css" th:href="@{/static/css/mystyle.css}" rel="stylesheet"/>
 </head>
 <body onload="handleShowable()">
-<!--  <div th:with="dateFromSession=${alreadySelectedDate}"></div>
-  <div th:with="productFromSession=${alreadySelectedProduct}"></div>-->
+    <svg id="svg-background" class="position-absolute" viewBox="0 0 2560 880">
+        <g>
+            <linearGradient id="svg-gradient" x1="0" x2="1" y1="0" y2="0">
+                <stop stop-color="hsl(217, 88%, 33.7%)" offset="0"></stop>
+                <stop stop-color="hsl(217, 88%, 75.1%)" offset="1"></stop>
+            </linearGradient>
+            <path d="" fill="url(#svg-gradient)" opacity="0.4">
+                <animate
+                        attributeName="d"
+                        dur="33s"
+                        repeatCount="indefinite"
+                        values="M0 0L 0 804.2328934685746Q 320 597.3613372284876  640 571.0708916590191T 1280 512.0661063245175T 2560 301.8788007488083L 2560 0 Z;M0 0L 0 877.6839081951588Q 320 668.0720922803877  640 649.0018928349388T 1280 328.7087077664202T 2560 162.95038242563396L 2560 0 Z;M0 0L 0 724.9886210051687Q 320 661.4364572061575  640 623.2173947479624T 1280 359.20353038907734T 2560 135.51673041732283L 2560 0 Z;M0 0L 0 804.2328934685746Q 320 597.3613372284876  640 571.0708916590191T 1280 512.0661063245175T 2560 301.8788007488083L 2560 0 Z"
+                ></animate>
+            </path>
+            <path d="" fill="url(#svg-gradient)" opacity="0.4">
+                <animate
+                        attributeName="d"
+                        dur="33s"
+                        repeatCount="indefinite"
+                        values="M0 0L 0 765.7607191473613Q 320 641.7853945676919  640 624.2534689988059T 1280 365.27264408032966T 2560 190.38947978522663L 2560 0 Z;M0 0L 0 842.1984196370487Q 320 570.6690721707517  640 540.6844954979398T 1280 439.92879442880593T 2560 200.29713960445451L 2560 0 Z;M0 0L 0 796.6802345094818Q 320 721.9216894353016  640 696.8815669355181T 1280 373.6367381440213T 2560 196.63169821789495L 2560 0 Z;M0 0L 0 765.7607191473613Q 320 641.7853945676919  640 624.2534689988059T 1280 365.27264408032966T 2560 190.38947978522663L 2560 0 Z"
+                ></animate>
+            </path>
+            <path d="" fill="url(#svg-gradient)" opacity="0.4">
+                <animate
+                        attributeName="d"
+                        dur="33s"
+                        repeatCount="indefinite"
+                        values="M0 0L 0 801.7562714943509Q 320 634.0247183381232  640 605.7090791951217T 1280 503.9393370140325T 2560 224.7551247480177L 2560 0 Z;M0 0L 0 821.0401780336218Q 320 670.8690783540507  640 637.0744123031742T 1280 456.40745286432224T 2560 278.1294357804296L 2560 0 Z;M0 0L 0 744.0534225112256Q 320 637.6425395409125  640 593.2079605185819T 1280 457.03995196824286T 2560 254.87693899994804L 2560 0 Z;M0 0L 0 801.7562714943509Q 320 634.0247183381232  640 605.7090791951217T 1280 503.9393370140325T 2560 224.7551247480177L 2560 0 Z"
+                ></animate>
+            </path>
+            <path d="" fill="url(#svg-gradient)" opacity="0.4">
+                <animate
+                        attributeName="d"
+                        dur="33s"
+                        repeatCount="indefinite"
+                        values="M0 0L 0 817.8603658675457Q 320 592.9404308081629  640 559.1126621853513T 1280 428.9912604821798T 2560 209.017381620229L 2560 0 Z;M0 0L 0 802.0504889976935Q 320 561.3963273210122  640 537.6024084387631T 1280 430.41283267566695T 2560 256.1972069733954L 2560 0 Z;M0 0L 0 789.4448177495887Q 320 561.9675446430498  640 531.6192318019404T 1280 414.76018143244175T 2560 265.9163329632971L 2560 0 Z;M0 0L 0 817.8603658675457Q 320 592.9404308081629  640 559.1126621853513T 1280 428.9912604821798T 2560 209.017381620229L 2560 0 Z"
+                ></animate>
+            </path>
+            <path d="" fill="url(#svg-gradient)" opacity="0.4">
+                <animate
+                        attributeName="d"
+                        dur="33s"
+                        repeatCount="indefinite"
+                        values="M0 0L 0 844.0541574423102Q 320 623.0697081316591  640 592.8483890737847T 1280 469.85448734523794T 2560 190.81850676853674L 2560 0 Z;M0 0L 0 871.4928294956283Q 320 618.9784567388518  640 593.1183717103518T 1280 376.5051942642811T 2560 141.32293927545027L 2560 0 Z;M0 0L 0 782.0118384610068Q 320 727.3267836497654  640 694.0476176759635T 1280 518.1545471640493T 2560 276.0053882957168L 2560 0 Z;M0 0L 0 844.0541574423102Q 320 623.0697081316591  640 592.8483890737847T 1280 469.85448734523794T 2560 190.81850676853674L 2560 0 Z"
+                ></animate>
+            </path>
+        </g>
+    </svg>
 
-  <p th:text="'From session: ' + ${alreadySelectedDate} + ', ' + ${alreadySelectedProduct}"></p>
+    <section class="vh-100" >
+        <div class="container h-50">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-lg-12 col-xl-11 fade fade-delay-15">
+                    <div class="card text-black opacity-80" style="border-radius: 25px;">
+                        <div class="card-body p-md-5">
+                            <div class="row justify-content-center">
+                                <div class="col-md-10 col-lg-12 col-xl-11 order-2 order-lg-1">
 
-  <form name="reserve-form" action="#" th:action="@{/handle-reservation}" method="post">
-    <label for="selected-product">Select a product</label>
-    <select name="selected-product" id="selected-product" onchange="showDate()">
-        <div th:switch="${productList}">
-            <div th:case="null">No products yet</div>
-            <div th:case="*">
-                <option value="none">Select a product</option>
-                <div th:each="product : ${productList}">
-                    <option th:value="${product.getProductName()}" th:text="${product.getProductName()}"></option>
+                                    <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Reserve</p>
+                                    <form name="reserve-form" action="#" th:action="@{/handle-reservation}" method="post">
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="form-group">
+                                                    <select class="form-control col-sm-4" name="selected-product" id="selected-product" onchange="showDate()">
+                                                        <div th:switch="${productList}">
+                                                            <div th:case="null">No products yet</div>
+                                                            <div th:case="*">
+                                                                <option value="none" disabled selected>Select a product</option>
+                                                                <div th:each="product : ${productList}">
+                                                                    <option th:value="${product.getProductName()}" th:text="${product.getProductName()}"></option>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="form-group col-sm-4">
+                                                    <label for="selected-date" class="form-control-label font-weight-bold" id="label-date">Select a date to see available hours:</label>
+                                                    <input type="date" id="selected-date" name="selected-date" class="form-control" onchange="showSubmitCheckTime()">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div th:if="${result != null && result.equals(T(com.adissu.reserve.constants.ResultConstants).AVAILABLE)}">
+                                                    <select class="form-control" name="selected-hour" id="selected-hour" onchange="showSubmitReserve()">
+                                                        <option value="none" disabled selected>Selected an available hour</option>
+                                                        <div th:each="hour : ${freeTimeList}">
+                                                            <option th:value="${#strings.substring(hour, 0, 5)}" th:text="${#strings.substring(hour, 0, 5)}"></option>
+                                                        </div>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <button class="btn btn-primary btn-rounded btn-lg mb-5 mt-3" type="submit" id="submit-button-check-time" name="submitButton" value="time">Check availability for selected date and product</button>
+                                                </div>
+                                                <div class="col">
+                                                    <button class="btn btn-primary btn-rounded btn-lg mb-5 mt-3" type="submit" id="submit-button-reserve" name="submitButton" value="reserve">Reserve with selected date, time and product</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <a class="btn btn-danger btn-rounded btn-lg mt-5" th:href="@{/static}" role="button">
+                                        Go back
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </select>
-    <br>
-    <label for="selected-date" id="label-date">Select a date to see available hours:</label>
-    <input type="date" id="selected-date" name="selected-date" onchange="showSubmitCheckTime()">
-
-      <div th:if="${result != null && result.equals(T(com.adissu.reserve.constants.ResultConstants).AVAILABLE)}">
-        <select name="selected-hour" id="selected-hour" onchange="showSubmitReserve()">
-            <option value="none">Selected an available hour</option>
-            <div th:each="hour : ${freeTimeList}">
-                <option th:value="${#strings.substring(hour, 0, 5)}" th:text="${#strings.substring(hour, 0, 5)}"></option>
-            </div>
-        </select>
-      </div>
-
-    <br>
-    <button type="submit" id="submit-button-check-time" name="submitButton" value="time">Check availability for selected date and product</button>
-    <button type="submit" id="submit-button-reserve" name="submitButton" value="reserve">Reserve with selected date, time and product</button>
-  </form>
+    </section>
 
   <script th:inline="javascript">
       function handleShowable() {
@@ -86,11 +175,15 @@
       }
   </script>
 
-<script>
-    var today = new Date();
-    var nextDay = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-    document.getElementById("selected-date").min = nextDay.toISOString().split("T")[0];
-</script>
+    <script>
+        var today = new Date();
+        var nextDay = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+        document.getElementById("selected-date").min = nextDay.toISOString().split("T")[0];
+    </script>
+
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.1.0/mdb.min.js">
+    </script>
 
 </body>
 </html>

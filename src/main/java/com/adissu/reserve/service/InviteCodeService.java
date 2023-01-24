@@ -6,11 +6,13 @@ import com.adissu.reserve.entity.Client;
 import com.adissu.reserve.entity.InviteCode;
 import com.adissu.reserve.repository.ClientRepository;
 import com.adissu.reserve.repository.InviteCodeRepository;
+import com.adissu.reserve.util.DateUtil;
 import com.adissu.reserve.util.InviteCodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -39,16 +41,24 @@ public class InviteCodeService {
 
     private Optional<InviteCode> doGenerate(Optional<Client> clientOptional) {
         if( clientOptional.isEmpty() ) {
+            log.info("doGenerate - Client is empty");
             return Optional.empty();
         }
         Client client = clientOptional.get();
 
-        int maxInviteCodes = Integer.parseInt(adminConfigList.stream()
+        /*int maxInviteCodes = Integer.parseInt(adminConfigList.stream()
                 .filter(adminConfig -> adminConfig.getName().equals(AdminConfigConstants.MAX_INVITES_MONTHLY))
                 .findFirst()
                 .get().getValue());
 
+        log.info("doGenerate - maxInviteCodes = {}", maxInviteCodes);
+
         if( getInviteCodes(client.getEmail()).size() >= maxInviteCodes ) {
+            log.info("doGenerate - Client is empty");
+            return Optional.empty();
+        }*/
+
+        if( !letUserGenerate(getInviteCodes(client.getEmail())) ) {
             return Optional.empty();
         }
 
@@ -77,4 +87,39 @@ public class InviteCodeService {
         return optionalInviteCodes;
     }
 
+    public boolean letUserGenerate(List<InviteCode> inviteCodes) {
+        if( inviteCodes == null || inviteCodes.isEmpty() ) {
+            log.info("letUserGenerate - inviteCodes is null or empty.");
+            return true;
+        }
+
+        String currentMonth = String.valueOf(DateUtil.getCurrentMonth());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        if( currentMonth.length() == 1 ) {
+            currentMonth = "0" + currentMonth;
+        }
+
+        log.info("letUserGenerate - currentMonth = {}", currentMonth);
+
+        int generatedCodesThisMonth = 0;
+        String maxInviteCodesMonthly = adminConfigList.stream()
+                .filter(adminConfig -> adminConfig.getName().equals(AdminConfigConstants.MAX_INVITES_MONTHLY))
+                .map(AdminConfig::getValue)
+                .findFirst()
+                .orElse("0");
+
+        log.info("letUserGenerate - maxInviteCodesMonthly = {}", maxInviteCodesMonthly);
+
+        for( InviteCode inviteCode : inviteCodes ) {
+            if( simpleDateFormat.format(inviteCode.getGeneratedAt()).contains("-" + currentMonth + "-") ) {
+                generatedCodesThisMonth++;
+                if( generatedCodesThisMonth >= Integer.parseInt(maxInviteCodesMonthly) ) {
+                    log.info("letUserGenerate - generatedCodesThisMonth = {}, so we are not letting the client to generate more.", generatedCodesThisMonth);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }

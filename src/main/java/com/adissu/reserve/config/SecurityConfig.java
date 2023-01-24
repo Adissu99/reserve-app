@@ -25,7 +25,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
      * Registers the KeycloakAuthenticationProvider with the authentication manager.
      */
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
         KeycloakAuthenticationProvider authenticationProvider = new KeycloakAuthenticationProvider();
         authenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
 
@@ -68,6 +68,10 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
                 .antMatchers("/unregistered/**").permitAll()
                 .antMatchers("/resend-mail").permitAll()
                 .antMatchers("/favicon.*").permitAll()
+                .antMatchers("/css/**").permitAll()
+                .antMatchers("/imgs/**").permitAll()
+                .antMatchers("/js/**").permitAll()
+                .antMatchers("/static/**").permitAll()
 //                .antMatchers("/customers*").hasRole("USER")
 //                .antMatchers("/admin*").hasRole("ADMIN")
                 .anyRequest().authenticated()

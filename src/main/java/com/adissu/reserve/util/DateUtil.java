@@ -18,4 +18,8 @@ public class DateUtil {
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
+    public static int getCurrentMonth() {
+        return LocalDate.now().getMonthValue();
+    }
+
 }

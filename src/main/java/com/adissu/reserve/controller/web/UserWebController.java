@@ -41,7 +41,7 @@ public class UserWebController {
 
     @GetMapping("/logout")
     @RolesAllowed({"client", "admin"})
-    public String logout(HttpServletRequest httpServletRequest) {
+    public String logout(HttpServletRequest httpServletRequest, Model model) {
         try {
             httpServletRequest.logout();
 
@@ -50,7 +50,16 @@ public class UserWebController {
             throw new RuntimeException(e);
         }
 
-        return "/user/logout";
+        model.addAttribute("role", "unregistered");
+        return "/unregistered/index";
+    }
+
+    @GetMapping("/login-form")
+    @RolesAllowed({"client", "admin"})
+    public String login(Model model, HttpServletRequest httpServletRequest) {
+        String role = WebUtil.getRole(httpServletRequest);
+        model.addAttribute("role", role);
+        return "/unregistered/index";
     }
 
     @PostMapping(path = "/handle-reservation", params = "submitButton=time")
@@ -98,13 +107,15 @@ public class UserWebController {
 
     @GetMapping("/after-reserve")
     @RolesAllowed({"client", "admin"})
-    public String handleAfterReserve(@RequestParam("submitButton") String destination, Model model) {
+    public String handleAfterReserve(@RequestParam("submitButton") String destination, Model model, HttpServletRequest httpServletRequest) {
         String page = "";
         switch (destination) {
             case "info":
                 page = "redirect:/info-client";
                 break;
             case "index":
+                String role = WebUtil.getRole(httpServletRequest);
+                model.addAttribute("role", role);
                 page = "/unregistered/index";
                 break;
             case "reserve":
@@ -148,8 +159,10 @@ public class UserWebController {
     public String showInviteCodeForm(Model model, HttpServletRequest httpServletRequest) {
         String email = WebUtil.getUsername(httpServletRequest);
         List<InviteCode> inviteCodes = inviteCodeService.getInviteCodes(email);
+        boolean letUserGenerate = inviteCodeService.letUserGenerate(inviteCodes);
 
         model.addAttribute("inviteCodes", inviteCodes);
+        model.addAttribute("letUserGenerate", letUserGenerate);
 
         return "/user/invite";
     }
@@ -160,8 +173,11 @@ public class UserWebController {
         String email = WebUtil.getUsername(httpServletRequest);
         Optional<InviteCode> inviteCode = inviteCodeService.generateInviteCode(email);
         List<InviteCode> inviteCodes = inviteCodeService.getInviteCodes(email);
+        boolean letUserGenerate = inviteCodeService.letUserGenerate(inviteCodes);
 
         model.addAttribute("inviteCodes", inviteCodes);
+        model.addAttribute("letUserGenerate", letUserGenerate);
+
         if( inviteCode.isEmpty() ) {
             model.addAttribute("result", ResultConstants.ERROR_NOT_FOUND);
         } else {

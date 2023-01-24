@@ -3,15 +3,16 @@ package com.adissu.reserve.controller.web;
 import com.adissu.reserve.constants.ResultConstants;
 import com.adissu.reserve.dto.ClientDTO;
 import com.adissu.reserve.service.ClientService;
+import com.adissu.reserve.util.WebUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Controller
@@ -22,13 +23,15 @@ public class UnregisteredWebController {
     private final ClientService clientService;
 
     @GetMapping("/")
-    public String index() {
+    public String index(Model model, HttpServletRequest httpServletRequest) {
+        String role = WebUtil.getRole(httpServletRequest);
+        model.addAttribute("role", role);
         return "/unregistered/index";
     }
 
     @GetMapping("/static")
     public String indexStatic() {
-        return "/unregistered/index";
+        return "redirect:/";
     }
 
     @GetMapping("/register")
@@ -38,15 +41,15 @@ public class UnregisteredWebController {
     }
 
     @PostMapping("/register-client")
-    public String registerClient(@Valid ClientDTO clientDTO, BindingResult result) {
-        if( result.hasErrors() ) {
+    public String registerClient(@Valid ClientDTO clientDTO) {
+        /*if( result.hasErrors() ) {
             return "/unregistered/register";
-        }
+        }*/
         log.info("Got client {} from request", clientDTO);
 
         clientService.registerClient(clientDTO);
 
-        return "/unregistered/index";
+        return "redirect:/";
     }
 
     @GetMapping("/api/client/activate")

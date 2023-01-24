@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 public class WebUtil {
@@ -23,6 +24,24 @@ public class WebUtil {
         }
 
         return username;
+    }
+
+    public static String getRole(HttpServletRequest httpServletRequest) {
+        KeycloakSecurityContext keycloakSecurityContext = (KeycloakSecurityContext) httpServletRequest.getAttribute(KeycloakSecurityContext.class.getName());
+        if( keycloakSecurityContext == null ) {
+            log.info("Security Context is null.");
+        } else {
+            Set<String> roles = keycloakSecurityContext.getToken().getRealmAccess().getRoles();
+            if( roles.contains("admin") ) {
+                log.info("Role is admin");
+                return "admin";
+            } else if( roles.contains("client") ) {
+                log.info("Role is client");
+                return "client";
+            }
+        }
+
+        return "unregistered";
     }
 
     public static String formatDateString(String date) {
